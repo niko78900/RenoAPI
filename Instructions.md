@@ -17,11 +17,25 @@ number of workers, Estimation for finishing)
 
 - Tasks entity (Progress % (Double), Assigned contractor(String),ID, Name, Status (Done, Working, Not Started))
 
-Create new project: Assign budget, Assign contractor, Assign # of workers, Assign address
+Create new project ( POST ): Assign budget, Assign contractor, Assign # of workers, Assign address
 Things that will generate(Tasks List, Milestones, Estimation for finishing, Photo Gallery)
 
-Update said project: Give it a list of tasks
+Update said project ( PUT ): add a new Task or give it a list of tasks
 
-Read Project: Project ID, Project Name, Assigned contractor, Assigned budget, Progress %, Estimation for finishing. 
+Read Project ( GET ): Project ID, Project Name, Assigned contractor, Assigned budget, Progress %, Estimation for finishing. DONE!
 
+Upload photo ( POST ): Upload a photo to a specific project
 
+Mark milestone ( PATCH ): Mark a milestone that was crossed
+
+Export timeline ( GET ): Export the timeline i.e Task list, Estimated time of finishing, dates of each task and each milestone that has been finished/hit
+
+Update budget ( PATCH ): Change the budget on a specific project
+
+Update contractor ( PATCH ): Change the contractor assigned to the project
+
+Delete Project ( DELETE ): Delete project
+
+Change address ( PATCH ): Change the address
+
+Audit Log ( GET ): Audit changes made by admin. Finishing of tasks etc.
