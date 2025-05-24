@@ -20,6 +20,9 @@ public class Task {
 
     private String status; //Statuses available: "FINISHED" , "WORKING" , "NOT_STARTED"
 
+    public Task() {
+    }
+
     public Task(Project project, String name, String status) {
         this.project = project;
         this.name = name;

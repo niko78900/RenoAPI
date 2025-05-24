@@ -22,8 +22,7 @@ public class Project {
     private String address;
     private int progress;
     private int number_of_workers;
-    private List<String> Milestones;
-    @OneToMany
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     //@JsonIgnore
     private List<Task> taskList;
     private int ETA;
@@ -40,7 +39,6 @@ public class Project {
         this.progress = 0;
         double workerratio = (budget / 2) / 1500; //Dividing the budget by 2 and making sure that every worker can get paid at least 1500 USD for the job
         this.number_of_workers = (int) workerratio;
-        Milestones = new ArrayList<>();
         this.ETA = ETA;
     }
 
@@ -88,10 +86,6 @@ public class Project {
         this.number_of_workers = number_of_workers;
     }
 
-    public void setMilestones(List<String> milestones) {
-        Milestones = milestones;
-    }
-
     public Long getId() {
         return id;
     }
@@ -118,9 +112,5 @@ public class Project {
 
     public int getNumber_of_workers() {
         return number_of_workers;
-    }
-
-    public List<String> getMilestones() {
-        return Milestones;
     }
 }

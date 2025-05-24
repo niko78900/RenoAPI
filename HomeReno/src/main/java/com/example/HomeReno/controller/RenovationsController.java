@@ -2,16 +2,14 @@ package com.example.HomeReno.controller;
 
 
 import com.example.HomeReno.entity.Project;
+import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
 import com.example.HomeReno.service.ProjectService;
 import com.example.HomeReno.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -78,5 +76,47 @@ public class RenovationsController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/addProject")
+    public Project createProject(@RequestBody Project project){
+        return ProjectService.createProject(project);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteProject(@PathVariable Long id){
+        ProjectService.deleteProject(id);
+    }
+
+    @PostMapping("/{ProjectId}/tasks")
+    public ResponseEntity<Project> addTaskToProject(@PathVariable long ProjectId, @RequestBody Task task){
+        try{
+            return ResponseEntity.ok(ProjectService.addTaskToProject(ProjectId, task));
+        } catch (RuntimeException e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{ProjectId}/tasks/{taskId}")
+    public void removeTaskFromproject(@PathVariable long ProjectId, @PathVariable Long taskId){
+        try {
+            ProjectService.removeTaskFromProject(ProjectId, taskId);
+        } catch (RuntimeException e){
+            e.printStackTrace();
+        }
+    }
+
+    @PatchMapping("/{ProjectId}/cname")
+    public Project ChangeContractorInProject(@PathVariable long ProjectId, @RequestBody String Contractor){
+        return ProjectService.ChangeContractorOnProject(ProjectId, Contractor);
+    }
+
+    @PatchMapping("/{ProjectId}/Address")
+    public Project ChangeAddressInProject(@PathVariable long ProjectId, @RequestBody String Address){
+        return ProjectService.ChangeAddressOnProject(ProjectId, Address);
+    }
+
+    @PatchMapping("/{ProjectId}/Budget")
+    public Project ChangeBudgetInProject(@PathVariable long ProjectId, @RequestBody Double Budget){
+        return ProjectService.ChangeBudgetOnProject(ProjectId, Budget);
+    }
 
 }

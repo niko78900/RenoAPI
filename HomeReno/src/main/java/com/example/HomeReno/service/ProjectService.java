@@ -2,6 +2,7 @@ package com.example.HomeReno.service;
 
 
 import com.example.HomeReno.entity.Project;
+import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +45,6 @@ public class ProjectService {
         return projectRepository.findByAddress(Address);
     }
 
-    //Export timeline ( GET ): Export the timeline i.e
-    //Task list, Estimated time of finishing, dates of each task and each milestone that has been finished/hit
-
     public Map<String, Object> GetTimeline(Long id){
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project NOT found"));
@@ -59,4 +57,54 @@ public class ProjectService {
 
         return response;
     }
+
+    public void deleteProject(Long id){
+        projectRepository.deleteById(id);
+    }
+
+    public Project addTaskToProject(Long ProjectId, Task task){
+        return projectRepository.findById(ProjectId).map(project -> {
+            project.getTaskList().add(task);
+            task.setProject(project);
+            taskRepository.save(task);
+            return projectRepository.save(project);
+        }).orElseThrow(() -> new RuntimeException("Project not found"));
+    }
+
+    public void removeTaskFromProject(Long ProjectId, Long TaskId){
+        Project project = projectRepository.findById(ProjectId)
+                .orElseThrow(() -> new RuntimeException("Project was not found"));
+
+        project.getTaskList().removeIf(task -> task.getId() == TaskId);
+
+        projectRepository.save(project);
+    }
+
+    public Project ChangeContractorOnProject(Long Id, String Contractor){
+        Project project = projectRepository.findById(Id).orElseThrow(() -> new RuntimeException("Project was not found"));
+
+        project.setContractor(Contractor);
+
+        return projectRepository.save(project);
+    }
+
+    public Project ChangeAddressOnProject(Long Id, String Address){
+        Project project = projectRepository.findById(Id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+
+        project.setAddress(Address);
+
+        return projectRepository.save(project);
+    }
+
+    public Project ChangeBudgetOnProject(Long Id, Double Budget){
+        Project project = projectRepository.findById(Id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+
+        project.setBudget(Budget);
+        double workerratio = (Budget / 2) / 1500;
+        project.setNumber_of_workers((int) workerratio);
+
+        return projectRepository.save(project);
+    }
+
+
 }

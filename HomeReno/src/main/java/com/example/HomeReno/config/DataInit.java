@@ -23,7 +23,7 @@ public class DataInit {
                         List.of(//String name, Double budget, String selected_contractor, String address
                                 new Project("Sport Center Renovation", 95000.0, "Anthony Smith", "517 W Arbor Ave", 4),
                                 new Project("Mall Renovation", 1500000.0, "Anthony Smith", "706 Kirkwood Mall", 9),
-                                new Project("Park Renovation", 250000.0, "Anthony Smith", "205 E Reno Ave", 1)
+                                new Project("Park Renovation", 250000.0, "Jerry Black", "205 E Reno Ave", 1)
                         )
                 );
             }
