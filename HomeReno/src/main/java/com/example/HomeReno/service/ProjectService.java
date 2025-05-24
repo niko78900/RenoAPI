@@ -52,8 +52,9 @@ public class ProjectService {
         Map<String, Object> response = new HashMap<>();
         response.put("ID", project.getId());
         response.put("Name", project.getName());
+        response.put("Progress:", project.getProgress() + " %");
         response.put("Task List", project.getTaskList());
-        response.put("Estimated Time to finish(Months): ", project.getETA());
+        response.put("Estimated Time to finish: ", project.getETA() + " Months");
 
         return response;
     }

@@ -66,6 +66,10 @@ public class Project {
         this.taskList = taskList;
     }
 
+    public void addTaskToList(Task task){
+        taskList.add(task);
+    }
+
     public void setName(String name) {
         this.name = name;
     }

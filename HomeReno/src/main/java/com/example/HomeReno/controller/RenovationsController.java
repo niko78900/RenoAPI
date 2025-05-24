@@ -64,8 +64,6 @@ public class RenovationsController {
         }
         return ResponseEntity.ok(projects); // 200 OK with the list
     }
-    //Export timeline ( GET ): Export the timeline i.e
-    //Task list, Estimated time of finishing, dates of each task and each milestone that has been finished/hit
 
     @GetMapping("/timeline/{id}")
     public ResponseEntity<Map<String, Object>> getTimeLine(@PathVariable Long id){
