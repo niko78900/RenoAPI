@@ -23,18 +23,18 @@ public class DataInit {
             public void run(String... args) throws Exception {
                 List<Project> savedProject = projectRepository.saveAll(
                         List.of(//String name, Double budget, String selected_contractor, String address
-                                new Project("Sport Center Renovation", 95000.0, "Anthony Smith", "517 W Arbor Ave", 4),
-                                new Project("Mall Renovation", 1500000.0, "Anthony Smith", "706 Kirkwood Mall", 9),
-                                new Project("Park Renovation", 25000.0, "Jerry Black", "205 E Reno Ave", 1)
+                                new Project("2 Bedroom Renovation", 25000.0, "Anthony Smith", "128 E Indiana Ave", 2),
+                                new Project("3 Bedroom Apartment renovation", 30000.0, "Anthony Smith", "114 E Indiana Ave", 3),
+                                new Project("House Renovation", 25000.0, "Jerry Black", "205 E Reno Ave", 6)
                         )
                 );
                 List<Task> TaskListA = new ArrayList<>(
                         List.of(
-                                new Task(savedProject.get(0), "Purchase Sports Equipment", "Finished"),
-                                new Task(savedProject.get(0), "Store Sports Equipment", "Working"),
+                                new Task(savedProject.get(0), "Purchase Paint", "Finished"),
+                                new Task(savedProject.get(0), "Paint the walls", "Working"),
                                 new Task(savedProject.get(0), "Set up electrical circuitry", "Finished"),
-                                new Task(savedProject.get(0), "Tile Female Bathroom floor", "Finished"),
-                                new Task(savedProject.get(0), "Tile Male Bathroom floor", "Finished")
+                                new Task(savedProject.get(0), "Tile Bathroom floor", "Finished"),
+                                new Task(savedProject.get(0), "Set up kitchen amenities", "Finished")
                         )
                 );
                 savedProject.get(0).setTaskList(TaskListA);
@@ -42,11 +42,11 @@ public class DataInit {
 
                 List<Task> TaskListB = new ArrayList<>(
                         List.of(
-                                new Task(savedProject.get(1), "Sell commercial space", "Working"),
+                                new Task(savedProject.get(1), "Set up new kitchen amenities", "Working"),
                                 new Task(savedProject.get(1), "Setup security solution", "Working"),
                                 new Task(savedProject.get(1), "Set up electrical circuitry", "Finished"),
-                                new Task(savedProject.get(1), "Tile Female Bathroom floors", "Finished"),
-                                new Task(savedProject.get(1), "Tile Male Bathroom floors", "Finished"),
+                                new Task(savedProject.get(1), "Tile Bathroom floors", "Finished"),
+                                new Task(savedProject.get(1), "Decorate office", "Not Started"),
                                 new Task(savedProject.get(1), "Paint Walls", "Finished")
                         )
                 );
@@ -57,10 +57,10 @@ public class DataInit {
                         List.of(
                                 new Task(savedProject.get(2), "Set up kids playground", "Not Started"),
                                 new Task(savedProject.get(2), "Purchase kids playground attractions", "Working"),
-                                new Task(savedProject.get(2), "Plant Trees", "Working"),
-                                new Task(savedProject.get(2), "Set up benches", "Finished"),
-                                new Task(savedProject.get(2), "Pave pathways", "Finished"),
-                                new Task(savedProject.get(2), "Place Street Lamps", "Finished")
+                                new Task(savedProject.get(2), "Plant a tree", "Working"),
+                                new Task(savedProject.get(2), "Set up backyard", "Working"),
+                                new Task(savedProject.get(2), "Clean Garage", "Finished"),
+                                new Task(savedProject.get(2), "Build shed in the backyard", "Not Started")
                         )
                 );
                 savedProject.get(2).setTaskList(TaskListC);
