@@ -1,18 +1,16 @@
 package com.example.HomeReno.entity;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "projects")
 public class Project {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
     
     private String name;
     private Double budget;
@@ -20,16 +18,15 @@ public class Project {
     private String address;
     private int progress;
     private int number_of_workers;
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
-    //@JsonIgnore
-    private List<Task> taskList;
+
+    private List<String>taskIds;
     private int ETA;
 
     public Project() {
     }
 
     public Project(String name, Double budget, String selected_contractor, String address, int ETA) {
-        this.taskList = new ArrayList<>();
+        this.taskIds = new ArrayList<>();
         this.name = name;
         this.budget = budget;
         this.contractor = selected_contractor;
@@ -56,16 +53,16 @@ public class Project {
         return address;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public void setTaskList(List<Task> taskList) {
-        this.taskList = taskList;
+    public void setTaskIds(List<String> taskIds) {
+        this.taskIds = taskIds;
     }
 
-    public void addTaskToList(Task task){
-        taskList.add(task);
+    public void addTaskToList(String taskId){
+        taskIds.add(taskId);
     }
 
     public void setName(String name) {
@@ -88,12 +85,12 @@ public class Project {
         this.number_of_workers = number_of_workers;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public List<Task> getTaskList() {
-        return taskList;
+    public List<String> getTaskIds() {
+        return taskIds;
     }
 
     public String getName() {

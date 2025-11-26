@@ -1,20 +1,16 @@
 package com.example.HomeReno.entity;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+@Document(collection = "tasks")
 public class Task {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    @JsonIgnore
-    private Project project;
+    private String id;
+    
+    private String projectId;
 
     private String name;
 
@@ -23,18 +19,18 @@ public class Task {
     public Task() {
     }
 
-    public Task(Project project, String name, String status) {
-        this.project = project;
+    public Task(String projectId, String name, String status) {
+        this.projectId = projectId;
         this.name = name;
         this.status = status;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 
     public void setName(String name) {
@@ -45,12 +41,12 @@ public class Task {
         this.status = status;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public Project getProject() {
-        return project;
+    public String getProjectId() {
+        return projectId;
     }
 
     public String getName() {

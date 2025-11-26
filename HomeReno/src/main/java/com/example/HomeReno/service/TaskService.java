@@ -6,6 +6,7 @@ import com.example.HomeReno.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -14,7 +15,19 @@ public class TaskService {
     @Autowired
     private TaskRepository taskRepository;
 
-    public Optional<Task> getTaskById(Long Id){
+    public Optional<Task> getTaskById(String Id){
         return taskRepository.findById(Id);
+    }
+
+    public Task saveTask(Task task) {
+    return taskRepository.save(task);
+    }
+    
+    public void deleteTask(String id) {
+    taskRepository.deleteById(id); 
+    }
+    
+    public List<Task> getTasksByProjectId(String projectId) {
+    return taskRepository.findByProjectId(projectId);
     }
 }
