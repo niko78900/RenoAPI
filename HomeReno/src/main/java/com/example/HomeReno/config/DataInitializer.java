@@ -1,9 +1,11 @@
 package com.example.HomeReno.config;
 
+import com.example.HomeReno.entity.Contractor;
 import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
+import com.example.HomeReno.repository.ContractorRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,16 +17,22 @@ import java.util.List;
 public class DataInitializer {
 
     @Bean
-    CommandLineRunner initData(ProjectRepository projectRepo, TaskRepository taskRepo) {
+    CommandLineRunner initData(ProjectRepository projectRepo, TaskRepository taskRepo, ContractorRepository contractorRepository) {
         return args -> {
 
             // Clear DB
             projectRepo.deleteAll();
             taskRepo.deleteAll();
+            
+            Contractor c1 = new Contractor("John Markovski", 1200.0, Contractor.Expertise.SENIOR);
+            Contractor c2 = new Contractor("Elena Stojanova", 600.0, Contractor.Expertise.JUNIOR);
+            Contractor c3 = new Contractor("Petar Ilievski", 850.0, Contractor.Expertise.APPRENTICE);
+
+            contractorRepository.saveAll(List.of(c1, c2, c3));
 
             // Create example project
             // String name, Double budget, String selected_contractor, String address, int ETA
-            Project p = new Project("Home Renovation #1", 50000.0, "John Doe", "Jurij Gagarin 74A", 3);
+            Project p = new Project("Home Renovation #1", 50000.0, c1.getId(), "Jurij Gagarin 74A", 3);
             p.setETA(3);
 
             // Save project to get ID
@@ -52,6 +60,9 @@ public class DataInitializer {
             projectRepo.save(p);
 
             System.out.println("✔ Database initialized with sample data.");
+
+            
+            
         };
     }
 }

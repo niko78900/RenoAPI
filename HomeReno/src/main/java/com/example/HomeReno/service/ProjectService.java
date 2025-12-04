@@ -39,8 +39,8 @@ public class ProjectService {
         return projectRepository.findByName(name);
     }
 
-    public List<Project> getProjectsByContractorsName(String contractor){
-        return projectRepository.findAllByContractor(contractor);
+    public List<Project> getProjectsByContractorsName(String contractorId){
+        return projectRepository.findByContractorId(contractorId);
     }
 
     public Optional<Project> getProjectByAddress(String Address){

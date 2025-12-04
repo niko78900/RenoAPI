@@ -14,7 +14,7 @@ public class Project {
     
     private String name;
     private Double budget;
-    private String contractor;
+    private String contractorId;   // references Contractor._id
     private String address;
     private int progress;
     private int number_of_workers;
@@ -29,7 +29,7 @@ public class Project {
         this.taskIds = new ArrayList<>();
         this.name = name;
         this.budget = budget;
-        this.contractor = selected_contractor;
+        this.contractorId = selected_contractor;
         this.address = address;
         this.progress = 0;
         double workerratio = (budget / 2) / 1500; //Dividing the budget by 2 and making sure that every worker can get paid at least 1500 USD for the job
@@ -74,7 +74,7 @@ public class Project {
     }
 
     public void setContractor(String contractor) {
-        this.contractor = contractor;
+        this.contractorId = contractor;
     }
 
     public void setProgress(int progress) {
@@ -102,7 +102,7 @@ public class Project {
     }
 
     public String getContractor() {
-        return contractor;
+        return contractorId;
     }
 
     public int getProgress() {
