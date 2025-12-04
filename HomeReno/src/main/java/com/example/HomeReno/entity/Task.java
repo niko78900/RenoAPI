@@ -14,12 +14,19 @@ public class Task {
 
     private String name;
 
-    private String status; //Statuses available: "FINISHED" , "WORKING" , "NOT_STARTED"
+    private Status status; // Statuses available: "FINISHED" , "WORKING" , "NOT_STARTED", "CANCELED"
+
+    public enum Status {
+        NOT_STARTED,
+        WORKING,
+        FINISHED,
+        CANCELED
+    }
 
     public Task() {
     }
 
-    public Task(String projectId, String name, String status) {
+    public Task(String projectId, String name, Status status) {
         this.projectId = projectId;
         this.name = name;
         this.status = status;
@@ -37,7 +44,7 @@ public class Task {
         this.name = name;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -53,7 +60,7 @@ public class Task {
         return name;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 }

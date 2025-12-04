@@ -1,38 +1,24 @@
-Home Renovation Project API 
-Description: Manage renovation projects, tasks, contractors, budgets, and progress photos. 
-
-Authentication: API key in header.
-
-CRUD Method & Endpoint                                 Description
-
-Create POST /projects                   Create a new renovation project with budget.
-Read GET /projects/{id}/tasks           List all tasks and their statuses. 
-
-Note: Students must define 10+ endpoints 
-(e.g., assign contractor, upload photo, update budget, mark milestone, export timeline). 
+Renovation Project API 
+Description: Platform for management of projects. Assign contractors, get amount of workers calculated and ability to upload progress and finished photos of said project. Creation of projects with their details, choosing of contractors (with a vast array of different contractors with different skills and prices). Backend API in java, Database used is MongoDB, Frontend is angular.
 
 Entities:
-- Project entity (ID, Name, Assigned contractor, Budget(Double), Progress % (Double), Address(Location), photo gallery (List), Milestones (List), Export Function, Tasks(List), 
-number of workers, Estimation for finishing)
+Contractor:
+ID = randomly generated ID
+Fullname = Name
+Price per Project = price
+Expertise = One of 3 levels for a contractor: junior, apprentice or senior.
 
-- Tasks entity (Progress % (Double), Assigned contractor(String),ID, Name, Status (Done, Working, Not Started))
 
-Create new project ( POST ): Assign budget, Assign contractor, Assign # of workers, Assign address
-Things that will generate(Tasks List, Milestones, Estimation for finishing, Photo Gallery) DONE!
+Project:
+ID = randomly generated ID
+Name = Name of project
+Budget = Budget for the project. It gets calculated by trying to subtract the price of the contractor FIRST (if not possible return an error message) and then assigned to the project.
+Address = Location of project
+Progress = Progress in days left
+Num_of_workers = Assigned upon creation using the formula (budget / 2) / 1500 to give an estimation on how many workers are needed per project (it can be changed through the front end).
+Geolocation = Location in coordinates which are going to be used for the map interface front end if possible.
 
-Update said project ( POST ): add a new Task DONE!
-
-Read Project ( GET ): Project ID, Project Name, Assigned contractor, Assigned budget, Progress %, Estimation for finishing. DONE!
-
-Delete Project ( DELETE ): Delete project DONE!
-
-Delete Task from a specific project ( DELETE ) DONE!
-
-Export timeline ( GET ): Export the timeline i.e Task list, Estimated time of finishing, 
-dates of each task and each milestone that has been finished/hit DONE!
-
-Update contractor ( PATCH ): Change the contractor assigned to the project DONE!
-
-Update budget ( PATCH ): Change the budget on a specific project DONE!
-
-Change address ( PATCH ): Change the address DONE!
+Task:
+ID = randomly generated ID
+projectId = Used as a way to assign task to a specific project
+Status = Status of set task. Can be either not started, working, finished or canceled. It can never have two states.
