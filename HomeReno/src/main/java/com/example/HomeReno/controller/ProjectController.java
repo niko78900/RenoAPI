@@ -1,6 +1,5 @@
 package com.example.HomeReno.controller;
 
-
 import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.service.ProjectService;
@@ -11,9 +10,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+
 @RestController
 @RequestMapping("/api/projects")
-public class RenovationsController {
+public class ProjectController {
 
     @Autowired
     private ProjectService projectService;
@@ -25,7 +25,7 @@ public class RenovationsController {
     // GET ALL PROJECTS
     // -------------------------
     @GetMapping
-    public List<Project> getAllProjects(){
+    public List<Project> getAllProjects() {
         return projectService.getAllProjects();
     }
 
@@ -33,37 +33,37 @@ public class RenovationsController {
     // GET PROJECT BY ID
     // -------------------------
     @GetMapping("/{id}")
-    public ResponseEntity<Project> getProjectById(@PathVariable String id){
+    public ResponseEntity<Project> getProjectById(@PathVariable String id) {
         return projectService.getProjectById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // -------------------------
-    // GET BY ADDRESS
+    // GET PROJECT BY ADDRESS
     // -------------------------
     @GetMapping("/adr/{address}")
-    public ResponseEntity<Project> getProjectByAddress(@PathVariable String address){
+    public ResponseEntity<Project> getProjectByAddress(@PathVariable String address) {
         return projectService.getProjectByAddress(address)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // -------------------------
-    // GET BY NAME
+    // GET PROJECT BY NAME
     // -------------------------
     @GetMapping("/name/{name}")
-    public ResponseEntity<Project> getProjectByName(@PathVariable String name){
+    public ResponseEntity<Project> getProjectByName(@PathVariable String name) {
         return projectService.getProjectByName(name)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // -------------------------
-    // GET PROJECTS BY CONTRACTOR NAME
+    // GET BY CONTRACTOR NAME
     // -------------------------
     @GetMapping("/cname/{contractor}")
-    public ResponseEntity<List<Project>> getProjectsByContractorName(@PathVariable String contractor){
+    public ResponseEntity<List<Project>> getProjectsByContractorName(@PathVariable String contractor) {
         List<Project> projects = projectService.getProjectsByContractorsName(contractor);
         return projects.isEmpty()
                 ? ResponseEntity.noContent().build()
@@ -74,7 +74,7 @@ public class RenovationsController {
     // TIMELINE
     // -------------------------
     @GetMapping("/timeline/{id}")
-    public ResponseEntity<Map<String, Object>> getTimeLine(@PathVariable String id){
+    public ResponseEntity<Map<String, Object>> getTimeLine(@PathVariable String id) {
         Map<String, Object> response = projectService.GetTimeline(id);
         return response.isEmpty()
                 ? ResponseEntity.noContent().build()
@@ -85,7 +85,7 @@ public class RenovationsController {
     // CREATE PROJECT
     // -------------------------
     @PostMapping
-    public Project createProject(@RequestBody Project project){
+    public Project createProject(@RequestBody Project project) {
         return projectService.createProject(project);
     }
 
@@ -93,31 +93,30 @@ public class RenovationsController {
     // DELETE PROJECT
     // -------------------------
     @DeleteMapping("/{id}")
-    public void deleteProject(@PathVariable String id){
+    public void deleteProject(@PathVariable String id) {
         projectService.deleteProject(id);
     }
 
     // -------------------------
-    // ADD TASK
+    // ADD TASK TO PROJECT
     // -------------------------
     @PostMapping("/{projectId}/tasks")
     public ResponseEntity<Project> addTaskToProject(
             @PathVariable String projectId,
             @RequestBody Task task
-    ){
-        try{
+    ) {
+        try {
             return ResponseEntity.ok(projectService.addTaskToProject(projectId, task));
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     // -------------------------
-    // DELETE TASK FROM PROJECT
+    // REMOVE TASK FROM PROJECT
     // -------------------------
     @DeleteMapping("/{projectId}/tasks/{taskId}")
-    public void removeTaskFromProject(@PathVariable String projectId, @PathVariable String taskId){
+    public void removeTaskFromProject(@PathVariable String projectId, @PathVariable String taskId) {
         projectService.removeTaskFromProject(projectId, taskId);
     }
 }
-
