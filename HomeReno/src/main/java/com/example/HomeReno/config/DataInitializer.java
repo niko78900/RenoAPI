@@ -23,13 +23,9 @@ public class DataInitializer {
             taskRepo.deleteAll();
 
             // Create example project
-            Project p = new Project();
-            p.setName("Example Renovation");
-            p.setContractor("John Doe");
-            p.setAddress("123 Main Street");
-            p.setBudget(5000.0);
+            // String name, Double budget, String selected_contractor, String address, int ETA
+            Project p = new Project("Home Renovation #1", 50000.0, "John Doe", "Jurij Gagarin 74A", 3);
             p.setETA(3);
-            p.setProgress(10);
 
             // Save project to get ID
             p = projectRepo.save(p);
@@ -37,11 +33,11 @@ public class DataInitializer {
             // Create tasks
             Task t1 = new Task();
             t1.setProjectId(p.getId());
-            t1.setName("Demolition");
+            t1.setName("Clear rubble on plot");
 
             Task t2 = new Task();
             t2.setProjectId(p.getId());
-            t2.setName("Install Cabinets");
+            t2.setName("Build Foundation");
 
             // Save tasks
             t1 = taskRepo.save(t1);
