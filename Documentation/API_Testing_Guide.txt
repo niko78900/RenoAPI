@@ -25,12 +25,17 @@ Projects
   }
 - PATCH /api/projects/{id}/contractor
   Body: { "contractorId": "NEW_CONTRACTOR_ID" }
+- PATCH /api/projects/{id}/contractor/remove
 - PATCH /api/projects/{id}/address
   Body: { "address": "456 Updated Avenue" }
 - PATCH /api/projects/{id}/name
   Body: { "name": "Updated Project Name" }
 - PATCH /api/projects/{id}/budget
   Body: { "budget": 82000 }
+- PATCH /api/projects/{id}/progress
+  Body: { "progress": 65 }
+- PATCH /api/projects/{id}/eta
+  Body: { "eta": 3 }
 - POST /api/projects/{projectId}/tasks
   Body:
   {
