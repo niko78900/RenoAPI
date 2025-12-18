@@ -127,6 +127,12 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    public Project updateWorkers(String id, Integer workers){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        project.setNumber_of_workers(workers);
+        return projectRepository.save(project);
+    }
+
     public Project updateProgress(String id, Integer progress){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setProgress(progress);

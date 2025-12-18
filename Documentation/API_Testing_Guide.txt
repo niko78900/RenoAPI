@@ -32,6 +32,8 @@ Projects
   Body: { "name": "Updated Project Name" }
 - PATCH /api/projects/{id}/budget
   Body: { "budget": 82000 }
+- PATCH /api/projects/{id}/workers
+  Body: { "workers": 18 }
 - PATCH /api/projects/{id}/progress
   Body: { "progress": 65 }
 - PATCH /api/projects/{id}/eta

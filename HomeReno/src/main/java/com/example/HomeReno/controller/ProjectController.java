@@ -172,6 +172,22 @@ public class ProjectController {
     }
 
     // -------------------------
+    // UPDATE WORKER COUNT
+    // -------------------------
+    @PatchMapping("/{id}/workers")
+    public ResponseEntity<ProjectResponse> updateProjectWorkers(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        Object workersValue = payload.get("workers");
+        if (!(workersValue instanceof Number number)) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(toResponse(projectService.updateWorkers(id, number.intValue())));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
     // UPDATE PROGRESS
     // -------------------------
     @PatchMapping("/{id}/progress")
