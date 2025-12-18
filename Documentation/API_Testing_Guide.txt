@@ -10,7 +10,7 @@ Projects
 - GET /api/projects/adr/{address}
 - GET /api/projects/name/{name}
 - GET /api/projects/contractor/{contractorId}
-- GET /api/projects/timeline/{id}
+- GET /api/projects/timeline/{id} (Project ID)
 - POST /api/projects
   Body:
   {
@@ -27,6 +27,8 @@ Projects
   Body: { "contractorId": "NEW_CONTRACTOR_ID" }
 - PATCH /api/projects/{id}/address
   Body: { "address": "456 Updated Avenue" }
+- PATCH /api/projects/{id}/name
+  Body: { "name": "Updated Project Name" }
 - PATCH /api/projects/{id}/budget
   Body: { "budget": 82000 }
 - POST /api/projects/{projectId}/tasks
@@ -42,6 +44,7 @@ Contractors
 - GET /api/contractors/{id}
 - GET /api/contractors/search/{name}
 - GET /api/contractors/expertise/{level}
+- GET /api/contractors/expertise (lists enum values)
 - POST /api/contractors
   Body:
   {
@@ -63,6 +66,7 @@ Tasks
 - GET /api/tasks
 - GET /api/tasks/{id}
 - GET /api/tasks/project/{projectId}
+- GET /api/tasks/statuses (lists enum values)
 - POST /api/tasks
   Body:
   {
