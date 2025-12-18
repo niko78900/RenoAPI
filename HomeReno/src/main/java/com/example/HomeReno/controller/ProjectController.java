@@ -140,6 +140,22 @@ public class ProjectController {
     }
 
     // -------------------------
+    // UPDATE NAME
+    // -------------------------
+    @PatchMapping("/{id}/name")
+    public ResponseEntity<ProjectResponse> updateProjectName(@PathVariable String id, @RequestBody Map<String, String> payload) {
+        String name = payload.get("name");
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(toResponse(projectService.updateName(id, name)));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
     // UPDATE BUDGET
     // -------------------------
     @PatchMapping("/{id}/budget")

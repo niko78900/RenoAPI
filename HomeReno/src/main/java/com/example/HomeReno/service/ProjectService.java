@@ -109,6 +109,14 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    public Project updateName(String id, String name){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+
+        project.setName(name);
+
+        return projectRepository.save(project);
+    }
+
     public Project updateBudget(String id, Double budget){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 

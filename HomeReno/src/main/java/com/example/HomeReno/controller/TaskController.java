@@ -51,4 +51,9 @@ public class TaskController {
         return taskService.getTasksByProjectId(projectId);
     }
 
+    @GetMapping("/statuses")
+    public Task.Status[] getTaskStatuses() {
+        return Task.Status.values();
+    }
+
 }

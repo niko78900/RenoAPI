@@ -74,4 +74,12 @@ public class ContractorController {
     public List<Contractor> getByExpertise(@PathVariable Contractor.Expertise level) {
         return contractorService.findByExpertise(level);
     }
+
+    // -------------------------
+    // LIST EXPERTISE ENUMS
+    // -------------------------
+    @GetMapping("/expertise")
+    public Contractor.Expertise[] listExpertiseLevels() {
+        return Contractor.Expertise.values();
+    }
 }
