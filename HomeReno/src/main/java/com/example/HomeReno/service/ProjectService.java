@@ -127,5 +127,23 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    public Project updateProgress(String id, Integer progress){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        project.setProgress(progress);
+        return projectRepository.save(project);
+    }
+
+    public Project updateEta(String id, Integer eta){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        project.setETA(eta);
+        return projectRepository.save(project);
+    }
+
+    public Project removeContractor(String id){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        project.setContractor(null);
+        return projectRepository.save(project);
+    }
+
 
 }

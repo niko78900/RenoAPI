@@ -172,6 +172,50 @@ public class ProjectController {
     }
 
     // -------------------------
+    // UPDATE PROGRESS
+    // -------------------------
+    @PatchMapping("/{id}/progress")
+    public ResponseEntity<ProjectResponse> updateProjectProgress(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        Object progressValue = payload.get("progress");
+        if (!(progressValue instanceof Number number)) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(toResponse(projectService.updateProgress(id, number.intValue())));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
+    // UPDATE ETA
+    // -------------------------
+    @PatchMapping("/{id}/eta")
+    public ResponseEntity<ProjectResponse> updateProjectEta(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        Object etaValue = payload.get("eta");
+        if (!(etaValue instanceof Number number)) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(toResponse(projectService.updateEta(id, number.intValue())));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
+    // REMOVE CONTRACTOR
+    // -------------------------
+    @PatchMapping("/{id}/contractor/remove")
+    public ResponseEntity<ProjectResponse> removeProjectContractor(@PathVariable String id) {
+        try {
+            return ResponseEntity.ok(toResponse(projectService.removeContractor(id)));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
     // ADD TASK TO PROJECT
     // -------------------------
     @PostMapping("/{projectId}/tasks")
