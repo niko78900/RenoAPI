@@ -26,6 +26,17 @@ public class ContractorService {
         return contractorRepository.save(contractor);
     }
 
+    public Contractor updateContractor(String id, Contractor contractor) {
+        return contractorRepository.findById(id)
+                .map(existing -> {
+                    existing.setFullName(contractor.getFullName());
+                    existing.setPrice(contractor.getPrice());
+                    existing.setExpertise(contractor.getExpertise());
+                    return contractorRepository.save(existing);
+                })
+                .orElseThrow(() -> new RuntimeException("Contractor not found"));
+    }
+
     public void deleteContractor(String id) {
         contractorRepository.deleteById(id);
     }

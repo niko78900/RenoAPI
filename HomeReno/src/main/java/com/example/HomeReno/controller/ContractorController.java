@@ -42,6 +42,15 @@ public class ContractorController {
         return contractorService.createContractor(contractor);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Contractor> updateContractor(@PathVariable String id, @RequestBody Contractor contractor) {
+        try {
+            return ResponseEntity.ok(contractorService.updateContractor(id, contractor));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // -------------------------
     // DELETE CONTRACTOR
     // -------------------------

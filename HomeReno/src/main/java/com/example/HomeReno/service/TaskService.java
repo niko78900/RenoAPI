@@ -27,6 +27,17 @@ public class TaskService {
     return taskRepository.save(task);
     }
     
+    public Task updateTask(String id, Task task) {
+        return taskRepository.findById(id)
+                .map(existing -> {
+                    existing.setName(task.getName());
+                    existing.setStatus(task.getStatus());
+                    existing.setProjectId(task.getProjectId());
+                    return taskRepository.save(existing);
+                })
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+    }
+    
     public void deleteTask(String id) {
     taskRepository.deleteById(id); 
     }

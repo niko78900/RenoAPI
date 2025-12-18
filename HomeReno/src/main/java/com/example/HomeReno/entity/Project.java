@@ -1,10 +1,10 @@
 package com.example.HomeReno.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Document(collection = "projects")
 public class Project {
@@ -19,14 +19,13 @@ public class Project {
     private int progress;
     private int number_of_workers;
 
-    private List<String>taskIds;
+    private List<String> taskIds = new ArrayList<>();
     private int ETA;
 
     public Project() {
     }
 
     public Project(String name, Double budget, String selected_contractor, String address, int ETA) {
-        this.taskIds = new ArrayList<>();
         this.name = name;
         this.budget = budget;
         this.contractorId = selected_contractor;

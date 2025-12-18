@@ -32,6 +32,15 @@ public class TaskController {
         return taskService.saveTask(task);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Task> updateTask(@PathVariable String id, @RequestBody Task task) {
+        try {
+            return ResponseEntity.ok(taskService.updateTask(id, task));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public void deleteTask(@PathVariable String id) {
         taskService.deleteTask(id);

@@ -5,11 +5,10 @@ import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
-import com.mongodb.lang.NonNull;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +38,15 @@ public class ProjectService {
         return projectRepository.findByName(name);
     }
 
-    public List<Project> getProjectsByContractorsName(String contractorId){
+    public List<Project> getProjectsByContractorId(String contractorId){
         return projectRepository.findByContractorId(contractorId);
     }
 
-    public Optional<Project> getProjectByAddress(String Address){
-        return projectRepository.findByAddress(Address);
+    public Optional<Project> getProjectByAddress(String address){
+        return projectRepository.findByAddress(address);
     }
 
-    public Map<String, Object> GetTimeline(String id){
+    public Map<String, Object> getTimeline(String id){
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project NOT found"));
 
@@ -66,47 +65,55 @@ public class ProjectService {
     }
 
     public Project addTaskToProject(String projectId, Task task) {
-    return projectRepository.findById(projectId).map(project -> {
-        task.setProjectId(projectId);
-        Task savedTask = taskRepository.save(task);
-        project.getTaskIds().add(savedTask.getId());
-        return projectRepository.save(project);
+        return projectRepository.findById(projectId).map(project -> {
+            task.setProjectId(projectId);
+            Task savedTask = taskRepository.save(task);
+            List<String> taskIds = project.getTaskIds();
+            if (taskIds == null) {
+                taskIds = new ArrayList<>();
+                project.setTaskIds(taskIds);
+            }
+            taskIds.add(savedTask.getId());
+            return projectRepository.save(project);
 
-    }).orElseThrow(() -> new RuntimeException("Project not found"));
-}
+        }).orElseThrow(() -> new RuntimeException("Project not found"));
+    }
 
 
-    public void removeTaskFromProject(String ProjectId, String TaskId){
-        Project project = projectRepository.findById(ProjectId)
+    public void removeTaskFromProject(String projectId, String taskId){
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project was not found"));
 
-        project.getTaskIds().removeIf(id -> id.equals(TaskId));
+        List<String> taskIds = project.getTaskIds();
+        if (taskIds != null) {
+            taskIds.removeIf(id -> id.equals(taskId));
+        }
 
         projectRepository.save(project);
-        taskRepository.deleteById(TaskId);
+        taskRepository.deleteById(taskId);
     }
 
-    public Project ChangeContractorOnProject(String Id, String Contractor){
-        Project project = projectRepository.findById(Id).orElseThrow(() -> new RuntimeException("Project was not found"));
+    public Project updateContractor(String id, String contractorId){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found"));
 
-        project.setContractor(Contractor);
+        project.setContractor(contractorId);
 
         return projectRepository.save(project);
     }
 
-    public Project ChangeAddressOnProject(String Id, String Address){
-        Project project = projectRepository.findById(Id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+    public Project updateAddress(String id, String address){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
-        project.setAddress(Address);
+        project.setAddress(address);
 
         return projectRepository.save(project);
     }
 
-    public Project ChangeBudgetOnProject(String Id, Double Budget){
-        Project project = projectRepository.findById(Id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+    public Project updateBudget(String id, Double budget){
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
-        project.setBudget(Budget);
-        double workerratio = (Budget / 2) / 1500;
+        project.setBudget(budget);
+        double workerratio = (budget / 2) / 1500;
         project.setNumber_of_workers((int) workerratio);
 
         return projectRepository.save(project);
