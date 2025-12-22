@@ -111,13 +111,15 @@ public class ProjectController {
     // UPDATE PROJECT CONTRACTOR
     // -------------------------
     @PatchMapping("/{id}/contractor")
-    public ResponseEntity<ProjectResponse> updateProjectContractor(@PathVariable String id, @RequestBody Map<String, String> payload) {
-        String contractorId = payload.get("contractorId");
+    public ResponseEntity<ProjectResponse> updateProjectContractor(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        String contractorId = getString(payload, "contractorId");
         if (contractorId == null || contractorId.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateContractor(id, contractorId)));
+            return ResponseEntity.ok(toResponse(projectService.updateContractor(id, contractorId, latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -127,13 +129,15 @@ public class ProjectController {
     // UPDATE ADDRESS
     // -------------------------
     @PatchMapping("/{id}/address")
-    public ResponseEntity<ProjectResponse> updateProjectAddress(@PathVariable String id, @RequestBody Map<String, String> payload) {
-        String address = payload.get("address");
+    public ResponseEntity<ProjectResponse> updateProjectAddress(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        String address = getString(payload, "address");
         if (address == null || address.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateAddress(id, address)));
+            return ResponseEntity.ok(toResponse(projectService.updateAddress(id, address, latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -143,13 +147,15 @@ public class ProjectController {
     // UPDATE NAME
     // -------------------------
     @PatchMapping("/{id}/name")
-    public ResponseEntity<ProjectResponse> updateProjectName(@PathVariable String id, @RequestBody Map<String, String> payload) {
-        String name = payload.get("name");
+    public ResponseEntity<ProjectResponse> updateProjectName(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        String name = getString(payload, "name");
         if (name == null || name.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateName(id, name)));
+            return ResponseEntity.ok(toResponse(projectService.updateName(id, name, latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -164,8 +170,10 @@ public class ProjectController {
         if (!(budgetValue instanceof Number number)) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateBudget(id, number.doubleValue())));
+            return ResponseEntity.ok(toResponse(projectService.updateBudget(id, number.doubleValue(), latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -180,8 +188,10 @@ public class ProjectController {
         if (!(workersValue instanceof Number number)) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateWorkers(id, number.intValue())));
+            return ResponseEntity.ok(toResponse(projectService.updateWorkers(id, number.intValue(), latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -196,8 +206,10 @@ public class ProjectController {
         if (!(progressValue instanceof Number number)) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateProgress(id, number.intValue())));
+            return ResponseEntity.ok(toResponse(projectService.updateProgress(id, number.intValue(), latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -212,8 +224,10 @@ public class ProjectController {
         if (!(etaValue instanceof Number number)) {
             return ResponseEntity.badRequest().build();
         }
+        Double latitude = getDouble(payload, "latitude");
+        Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateEta(id, number.intValue())));
+            return ResponseEntity.ok(toResponse(projectService.updateEta(id, number.intValue(), latitude, longitude)));
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -269,6 +283,8 @@ public class ProjectController {
                 project.getId(),
                 project.getName(),
                 project.getAddress(),
+                project.getLatitude(),
+                project.getLongitude(),
                 project.getBudget(),
                 project.getProgress(),
                 project.getNumber_of_workers(),
@@ -277,5 +293,15 @@ public class ProjectController {
                 taskIds,
                 project.getETA()
         );
+    }
+
+    private static String getString(Map<String, Object> payload, String key) {
+        Object value = payload.get(key);
+        return value instanceof String stringValue ? stringValue : null;
+    }
+
+    private static Double getDouble(Map<String, Object> payload, String key) {
+        Object value = payload.get(key);
+        return value instanceof Number numberValue ? numberValue.doubleValue() : null;
     }
 }

@@ -6,6 +6,8 @@ public record ProjectResponse(
         String id,
         String name,
         String address,
+        Double latitude,
+        Double longitude,
         Double budget,
         int progress,
         int numberOfWorkers,

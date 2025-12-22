@@ -32,10 +32,13 @@ public class DataInitializer {
 
             contractorRepository.saveAll(List.of(c1, c2, c3, c4, c5));
 
+            Project project1 = new Project("Home Renovation #1", 50000.0, c1.getId(), "Jurij Gagarin 74A", 3);
+            project1.setLatitude(41.9836);
+            project1.setLongitude(21.4639);
             seedProject(
                     projectRepo,
                     taskRepo,
-                    new Project("Home Renovation #1", 50000.0, c1.getId(), "Jurij Gagarin 74A", 3),
+                    project1,
                     45,
                     List.of(
                             new TaskSeed("Clear rubble on plot", Task.Status.FINISHED),
@@ -45,10 +48,13 @@ public class DataInitializer {
                     )
             );
 
+            Project project2 = new Project("Kitchen Overhaul - Park Residence", 32000.0, c2.getId(), "Partizanska 11/3", 2);
+            project2.setLatitude(41.0290);
+            project2.setLongitude(21.3320);
             seedProject(
                     projectRepo,
                     taskRepo,
-                    new Project("Kitchen Overhaul - Park Residence", 32000.0, c2.getId(), "Partizanska 11/3", 2),
+                    project2,
                     30,
                     List.of(
                             new TaskSeed("Remove existing cabinetry", Task.Status.FINISHED),
@@ -58,10 +64,13 @@ public class DataInitializer {
                     )
             );
 
+            Project project3 = new Project("Mountain Cabin Extension", 61000.0, c3.getId(), "Matka Canyon Road 5", 4);
+            project3.setLatitude(41.9560);
+            project3.setLongitude(21.2940);
             seedProject(
                     projectRepo,
                     taskRepo,
-                    new Project("Mountain Cabin Extension", 61000.0, c3.getId(), "Matka Canyon Road 5", 4),
+                    project3,
                     55,
                     List.of(
                             new TaskSeed("Pour concrete piers", Task.Status.FINISHED),
@@ -71,10 +80,13 @@ public class DataInitializer {
                     )
             );
 
+            Project project4 = new Project("Urban Loft Makeover", 45000.0, c4.getId(), "Dimitar Vlahov 27", 3);
+            project4.setLatitude(41.9982);
+            project4.setLongitude(21.4254);
             seedProject(
                     projectRepo,
                     taskRepo,
-                    new Project("Urban Loft Makeover", 45000.0, c4.getId(), "Dimitar Vlahov 27", 3),
+                    project4,
                     20,
                     List.of(
                             new TaskSeed("Demolition and debris removal", Task.Status.FINISHED),
@@ -84,10 +96,13 @@ public class DataInitializer {
                     )
             );
 
+            Project project5 = new Project("Lake House Energy Retrofit", 38000.0, c5.getId(), "Ohrid Lakeshore 88", 2);
+            project5.setLatitude(41.1166);
+            project5.setLongitude(20.8016);
             seedProject(
                     projectRepo,
                     taskRepo,
-                    new Project("Lake House Energy Retrofit", 38000.0, c5.getId(), "Ohrid Lakeshore 88", 2),
+                    project5,
                     65,
                     List.of(
                             new TaskSeed("Audit existing insulation", Task.Status.FINISHED),
@@ -97,10 +112,13 @@ public class DataInitializer {
                     )
             );
 
+            Project project6 = new Project("Suburban Bathroom Upgrades", 21000.0, c1.getId(), "Blagoja Stefkovski 14", 1);
+            project6.setLatitude(42.0040);
+            project6.setLongitude(21.4585);
             seedProject(
                     projectRepo,
                     taskRepo,
-                    new Project("Suburban Bathroom Upgrades", 21000.0, c1.getId(), "Blagoja Stefkovski 14", 1),
+                    project6,
                     15,
                     List.of(
                             new TaskSeed("Demolition and plumbing rough-in", Task.Status.WORKING),

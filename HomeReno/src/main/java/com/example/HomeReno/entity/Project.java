@@ -16,6 +16,8 @@ public class Project {
     private Double budget;
     private String contractorId;   // references Contractor._id
     private String address;
+    private Double latitude;
+    private Double longitude;
     private int progress;
     private int number_of_workers;
 
@@ -50,6 +52,22 @@ public class Project {
 
     public String getAddress() {
         return address;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
     }
 
     public void setId(String id) {

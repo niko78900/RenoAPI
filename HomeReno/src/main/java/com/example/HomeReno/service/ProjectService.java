@@ -93,55 +93,62 @@ public class ProjectService {
         taskRepository.deleteById(taskId);
     }
 
-    public Project updateContractor(String id, String contractorId){
+    public Project updateContractor(String id, String contractorId, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found"));
 
         project.setContractor(contractorId);
+        applyCoordinates(project, latitude, longitude);
 
         return projectRepository.save(project);
     }
 
-    public Project updateAddress(String id, String address){
+    public Project updateAddress(String id, String address, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
         project.setAddress(address);
+        applyCoordinates(project, latitude, longitude);
 
         return projectRepository.save(project);
     }
 
-    public Project updateName(String id, String name){
+    public Project updateName(String id, String name, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
         project.setName(name);
+        applyCoordinates(project, latitude, longitude);
 
         return projectRepository.save(project);
     }
 
-    public Project updateBudget(String id, Double budget){
+    public Project updateBudget(String id, Double budget, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
         project.setBudget(budget);
         double workerratio = (budget / 2) / 1500;
         project.setNumber_of_workers((int) workerratio);
+        applyCoordinates(project, latitude, longitude);
 
         return projectRepository.save(project);
     }
 
-    public Project updateWorkers(String id, Integer workers){
+    public Project updateWorkers(String id, Integer workers, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setNumber_of_workers(workers);
+        applyCoordinates(project, latitude, longitude);
         return projectRepository.save(project);
     }
 
-    public Project updateProgress(String id, Integer progress){
+    public Project updateProgress(String id, Integer progress, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setProgress(progress);
+        applyCoordinates(project, latitude, longitude);
         return projectRepository.save(project);
     }
 
-    public Project updateEta(String id, Integer eta){
+    public Project updateEta(String id, Integer eta, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setETA(eta);
+        applyCoordinates(project, latitude, longitude);
         return projectRepository.save(project);
     }
 
@@ -151,5 +158,13 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    private void applyCoordinates(Project project, Double latitude, Double longitude) {
+        if (latitude != null) {
+            project.setLatitude(latitude);
+        }
+        if (longitude != null) {
+            project.setLongitude(longitude);
+        }
+    }
 
 }
