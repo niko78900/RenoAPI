@@ -11,6 +11,8 @@ Projects
 - GET /api/projects/name/{name}
 - GET /api/projects/contractor/{contractorId}
 - GET /api/projects/timeline/{id} (Project ID)
+- Project responses include latitude/longitude (nullable).
+- Latitude/longitude are optional in POST and PATCH bodies; omit to keep current coordinates.
 - POST /api/projects
   Body:
   {
@@ -18,26 +20,28 @@ Projects
     "budget": 75000,
     "contractor": "CONTRACTOR_ID_HERE",
     "address": "123 Main Street",
+    "latitude": 41.9982,
+    "longitude": 21.4254,
     "progress": 0,
     "number_of_workers": 20,
     "taskIds": [],
     "eta": 4
   }
 - PATCH /api/projects/{id}/contractor
-  Body: { "contractorId": "NEW_CONTRACTOR_ID" }
+  Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/contractor/remove
 - PATCH /api/projects/{id}/address
-  Body: { "address": "456 Updated Avenue" }
+  Body: { "address": "456 Updated Avenue", "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/name
-  Body: { "name": "Updated Project Name" }
+  Body: { "name": "Updated Project Name", "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/budget
-  Body: { "budget": 82000 }
+  Body: { "budget": 82000, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/workers
-  Body: { "workers": 18 }
+  Body: { "workers": 18, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/progress
-  Body: { "progress": 65 }
+  Body: { "progress": 65, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/eta
-  Body: { "eta": 3 }
+  Body: { "eta": 3, "latitude": 41.9982, "longitude": 21.4254 }
 - POST /api/projects/{projectId}/tasks
   Body:
   {
