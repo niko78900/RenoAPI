@@ -1,41 +1,59 @@
-Renovation Project API 
-Description: Platform for management of projects. Assign contractors, get amount of workers calculated and ability to upload progress and finished photos of said project. Creation of projects with their details, choosing of contractors (with a vast array of different contractors with different skills and prices). Backend API in java, Database used is MongoDB, Frontend is angular.
+HomeReno API Documentation
+==========================
+Base URL: http://localhost:8080
 
-Entities:
-    Contractor:
-    ID = randomly generated ID
-    Fullname = Name
-    Price per Project = price
-    Expertise = One of 3 levels for a contractor: junior, apprentice or senior.
+Overview
+- Manage renovation projects end-to-end: create/update projects, assign contractors, track tasks, and mark completion.
+- Stack: Spring Boot (Java) with MongoDB; Angular frontend; CORS allows http://localhost:4200.
 
+Domain Model
+- Project: id, name, budget, contractorId (nullable), address, latitude (nullable), longitude (nullable), progress (0-100), finished (boolean), number_of_workers, taskIds[], eta (months).
+  - Progress/finished: progress is percentage; finished is an explicit flag with dedicated endpoints.
+  - Workers: default on create is (budget / 2) / 1500; can be patched manually.
+  - Coordinates: optional on create/patch; omit latitude/longitude to keep existing values.
+- Contractor: id, fullName, price (per project), expertise (JUNIOR | APPRENTICE | SENIOR).
+- Task: id, name, projectId, status (NOT_STARTED | WORKING | FINISHED | CANCELED).
 
-    Project:
-    ID = randomly generated ID
-    Name = Name of project
-    Budget = Budget for the project. It gets calculated by trying to subtract the price of the contractor FIRST (if not possible return an error message) and then assigned to the project.
-    Address = Location of project
-    Progress = Progress in days left
-    Num_of_workers = Assigned upon creation using the formula (budget / 2) / 1500 to give an estimation on how many workers are needed per project (it can be changed through the front end or in console).
-    Geolocation = Location in coordinates which are going to be used for the map interface front end if possible.
+Project API (key routes)
+- GET /api/projects - list all projects.
+- GET /api/projects/{id} - fetch full project.
+- GET /api/projects/adr/{address} - fetch by address.
+- GET /api/projects/name/{name} - fetch by name.
+- GET /api/projects/contractor/{contractorId} - list projects for a contractor.
+- GET /api/projects/timeline/{id} - returns progress, ETA, and task list summary.
+- GET /api/projects/{id}/finished - returns only { "finished": true|false } for lightweight frontend checks.
+- POST /api/projects - create project (see body templates in API_Testing_Guide.txt).
+- PATCH /api/projects/{id}/contractor - set contractorId (and optional lat/long).
+- PATCH /api/projects/{id}/contractor/remove - clear contractor.
+- PATCH /api/projects/{id}/address | /name | /budget | /workers | /progress | /eta - update specific fields.
+- PATCH /api/projects/{id}/finished - update only the finished flag.
+- POST /api/projects/{projectId}/tasks - create a task and link it to the project.
+- DELETE /api/projects/{projectId}/tasks/{taskId} - remove a linked task.
 
-    Task:
-    ID = randomly generated ID
-    projectId = Used as a way to assign task to a specific project
-    Status = Status of set task. Can be either not started, working, finished or canceled. It can never have two states.
+Contractor API
+- GET /api/contractors
+- GET /api/contractors/{id}
+- GET /api/contractors/search/{name}
+- GET /api/contractors/expertise/{level}
+- GET /api/contractors/expertise - list enum values.
+- POST /api/contractors - create.
+- PUT /api/contractors/{id} - replace.
+- DELETE /api/contractors/{id}
 
-Behaviour:
-    General: 
-    Creation should be a simple intuitive procedure. User selects the option to create a project and is prompted by a new window. The user is then prompted to enter basic information such as the name of the project, the budget and the address. He will then be prompted to conitnue with the finer details and will be shown an estimation for the number of workers, a pre assigned geolcation (depending on the address and also displayed as a pin on the map) and the option to pick a contractor (Depending on the price), contractors outside of the price range will be greyed out (there should be a formula where there is recommended contractors that can be assigned based of the total budget). After inputting all of this information, the user will press next and in a new window will be asked to review the project details and finally click "submit", which then will be sent to the database, saved and the website will refresh to reflect the changes on the map.
-    Task progression will have 4 states as stated in the task class and will also have a loading bar style progression bar with a % done based on the completed tasks out of the total tasks assigned. This loading bar can change if more tasks are added.
+Task API
+- GET /api/tasks
+- GET /api/tasks/{id}
+- GET /api/tasks/project/{projectId}
+- GET /api/tasks/statuses - list enum values.
+- POST /api/tasks - create.
+- PUT /api/tasks/{id} - replace.
+- DELETE /api/tasks/{id}
 
-    Contractor:
-    Assigned via ID to a projects object and having his salary deducted from the budget. The contractors expertise dictates the speed of the projects progress and overall quality of the finished product.
-    Through the front end when creating a project, there should a window popup (with some sort of animation) showing the names of each contractor, their expertise and their salary. 
+Response Shape: Project
+Fields returned by ProjectResponse:
+- id, name, address, latitude, longitude, budget, progress, finished, numberOfWorkers, contractorId, contractorName (nullable), taskIds[], eta.
 
-    Project:
-    Can be created and modified through the front end. Administrators, creators of the project and contractors can change the status of the project.
-
-    Tasks:
-    Will be displayed to the user with their name, status and also the assigned project of it (you can navigate through that window to the actual project overview).
-
-
+Usage Notes
+- Use the dedicated finished endpoints when the frontend only needs the completion flag.
+- Latitude/longitude are nullable; omit them from PATCH bodies to avoid overwriting existing coordinates.
+- See Documentation/API_Testing_Guide.txt for request body templates and quick testing steps.
