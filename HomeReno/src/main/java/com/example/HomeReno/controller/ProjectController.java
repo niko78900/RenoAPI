@@ -67,6 +67,19 @@ public class ProjectController {
     }
 
     // -------------------------
+    // GET PROJECT FINISHED FLAG ONLY
+    // -------------------------
+    @GetMapping("/{id}/finished")
+    public ResponseEntity<Map<String, Boolean>> getFinishedFlag(@PathVariable String id) {
+        try {
+            boolean finished = projectService.getFinishedStatus(id);
+            return ResponseEntity.ok(Map.of("finished", finished));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
     // GET BY CONTRACTOR
     // -------------------------
     @GetMapping("/contractor/{contractorId}")
@@ -234,6 +247,22 @@ public class ProjectController {
     }
 
     // -------------------------
+    // UPDATE FINISHED FLAG
+    // -------------------------
+    @PatchMapping("/{id}/finished")
+    public ResponseEntity<ProjectResponse> updateFinishedFlag(@PathVariable String id, @RequestBody Map<String, Object> payload) {
+        Boolean finished = getBoolean(payload, "finished");
+        if (finished == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            return ResponseEntity.ok(toResponse(projectService.updateFinishedStatus(id, finished)));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // -------------------------
     // REMOVE CONTRACTOR
     // -------------------------
     @PatchMapping("/{id}/contractor/remove")
@@ -287,6 +316,7 @@ public class ProjectController {
                 project.getLongitude(),
                 project.getBudget(),
                 project.getProgress(),
+                project.isFinished(),
                 project.getNumber_of_workers(),
                 contractorId,
                 contractorName.orElse(null),
@@ -303,5 +333,10 @@ public class ProjectController {
     private static Double getDouble(Map<String, Object> payload, String key) {
         Object value = payload.get(key);
         return value instanceof Number numberValue ? numberValue.doubleValue() : null;
+    }
+
+    private static Boolean getBoolean(Map<String, Object> payload, String key) {
+        Object value = payload.get(key);
+        return value instanceof Boolean booleanValue ? booleanValue : null;
     }
 }

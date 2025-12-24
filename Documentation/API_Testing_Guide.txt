@@ -11,7 +11,9 @@ Projects
 - GET /api/projects/name/{name}
 - GET /api/projects/contractor/{contractorId}
 - GET /api/projects/timeline/{id} (Project ID)
+- GET /api/projects/{id}/finished (returns only { "finished": true|false })
 - Project responses include latitude/longitude (nullable).
+- Project responses include a finished flag (boolean).
 - Latitude/longitude are optional in POST and PATCH bodies; omit to keep current coordinates.
 - POST /api/projects
   Body:
@@ -23,6 +25,7 @@ Projects
     "latitude": 41.9982,
     "longitude": 21.4254,
     "progress": 0,
+    "finished": false,
     "number_of_workers": 20,
     "taskIds": [],
     "eta": 4
@@ -40,6 +43,8 @@ Projects
   Body: { "workers": 18, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/progress
   Body: { "progress": 65, "latitude": 41.9982, "longitude": 21.4254 }
+- PATCH /api/projects/{id}/finished
+  Body: { "finished": true }
 - PATCH /api/projects/{id}/eta
   Body: { "eta": 3, "latitude": 41.9982, "longitude": 21.4254 }
 - POST /api/projects/{projectId}/tasks

@@ -20,6 +20,7 @@ public class Project {
     private Double longitude;
     private int progress;
     private int number_of_workers;
+    private boolean finished;
 
     private List<String> taskIds = new ArrayList<>();
     private int ETA;
@@ -36,6 +37,7 @@ public class Project {
         double workerratio = (budget / 2) / 1500; //Dividing the budget by 2 and making sure that every worker can get paid at least 1500 USD for the job
         this.number_of_workers = (int) workerratio;
         this.ETA = ETA;
+        this.finished = false;
     }
 
     public void setETA(int ETA) {
@@ -98,6 +100,10 @@ public class Project {
         this.progress = progress;
     }
 
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
     public void setNumber_of_workers(int number_of_workers) {
         this.number_of_workers = number_of_workers;
     }
@@ -124,6 +130,10 @@ public class Project {
 
     public int getProgress() {
         return progress;
+    }
+
+    public boolean isFinished() {
+        return finished;
     }
 
     public int getNumber_of_workers() {

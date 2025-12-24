@@ -10,6 +10,7 @@ public record ProjectResponse(
         Double longitude,
         Double budget,
         int progress,
+        boolean finished,
         int numberOfWorkers,
         String contractorId,
         String contractorName,

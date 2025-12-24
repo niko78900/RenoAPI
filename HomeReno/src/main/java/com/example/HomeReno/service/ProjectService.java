@@ -60,6 +60,12 @@ public class ProjectService {
         return response;
     }
 
+    public boolean getFinishedStatus(String id) {
+        Project project = projectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Project NOT found"));
+        return project.isFinished();
+    }
+
     public void deleteProject(String id){
         projectRepository.deleteById(id);
     }
@@ -149,6 +155,12 @@ public class ProjectService {
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setETA(eta);
         applyCoordinates(project, latitude, longitude);
+        return projectRepository.save(project);
+    }
+
+    public Project updateFinishedStatus(String id, boolean finished) {
+        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        project.setFinished(finished);
         return projectRepository.save(project);
     }
 
