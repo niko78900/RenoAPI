@@ -28,22 +28,35 @@ public class TaskController {
     }
 
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.saveTask(task);
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        try {
+            return ResponseEntity.ok(taskService.saveTask(task));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Task> updateTask(@PathVariable String id, @RequestBody Task task) {
         try {
             return ResponseEntity.ok(taskService.updateTask(id, task));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteTask(@PathVariable String id) {
-        taskService.deleteTask(id);
+    public ResponseEntity<Void> deleteTask(@PathVariable String id) {
+        try {
+            taskService.deleteTask(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/project/{projectId}")
