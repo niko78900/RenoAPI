@@ -83,6 +83,8 @@ Tasks
 - GET /api/tasks/{id}
 - GET /api/tasks/project/{projectId}
 - GET /api/tasks/statuses (lists enum values)
+- projectId is required for task create/update. Tasks always belong to a project.
+- Creating/updating/deleting tasks updates Project.taskIds to stay in sync.
 - POST /api/tasks
   Body:
   {
@@ -90,6 +92,7 @@ Tasks
     "projectId": "PROJECT_ID_HERE",
     "status": "NOT_STARTED"
   }
+- POST /api/tasks returns 400 if projectId is missing, 404 if projectId does not exist.
 - PUT /api/tasks/{id}
   Body:
   {
@@ -98,7 +101,9 @@ Tasks
     "projectId": "PROJECT_ID_HERE",
     "status": "WORKING"
   }
-- DELETE /api/tasks/{id}
+- PUT /api/tasks/{id} can move a task to a different projectId.
+- PUT /api/tasks/{id} returns 400 if projectId is missing, 404 if task or project does not exist.
+- DELETE /api/tasks/{id} (204 on success, 404 if not found)
 
 Usage Tips
 - In Postman choose the HTTP method, set the URL, switch Body to raw JSON for POST/PUT/PATCH, paste the template, then send.
