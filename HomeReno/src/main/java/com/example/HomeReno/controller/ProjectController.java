@@ -83,6 +83,8 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> createProject(@RequestBody Project project) {
         try {
             return ResponseEntity.ok(toResponse(projectService.createProject(project)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -93,7 +95,7 @@ public class ProjectController {
     }
     @PatchMapping("/{id}/contractor")
     public ResponseEntity<ProjectResponse> updateProjectContractor(@PathVariable String id, @RequestBody Map<String, Object> payload) {
-        String contractorId = getString(payload, "contractorId");
+        String contractorId = getString(payload, "contractorId", "contractor");
         if (contractorId == null || contractorId.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
@@ -101,6 +103,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateContractor(id, contractorId, latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -115,6 +119,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateAddress(id, address, latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -129,6 +135,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateName(id, name, latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -143,20 +151,24 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateBudget(id, number.doubleValue(), latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
     }
     @PatchMapping("/{id}/workers")
     public ResponseEntity<ProjectResponse> updateProjectWorkers(@PathVariable String id, @RequestBody Map<String, Object> payload) {
-        Object workersValue = payload.get("workers");
-        if (!(workersValue instanceof Number number)) {
+        Number workersValue = getNumber(payload, "workers", "number_of_workers", "numberOfWorkers");
+        if (workersValue == null) {
             return ResponseEntity.badRequest().build();
         }
         Double latitude = getDouble(payload, "latitude");
         Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateWorkers(id, number.intValue(), latitude, longitude)));
+            return ResponseEntity.ok(toResponse(projectService.updateWorkers(id, workersValue.intValue(), latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -171,20 +183,24 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateProgress(id, number.intValue(), latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
     }
     @PatchMapping("/{id}/eta")
     public ResponseEntity<ProjectResponse> updateProjectEta(@PathVariable String id, @RequestBody Map<String, Object> payload) {
-        Object etaValue = payload.get("eta");
-        if (!(etaValue instanceof Number number)) {
+        Number etaValue = getNumber(payload, "eta", "ETA");
+        if (etaValue == null) {
             return ResponseEntity.badRequest().build();
         }
         Double latitude = getDouble(payload, "latitude");
         Double longitude = getDouble(payload, "longitude");
         try {
-            return ResponseEntity.ok(toResponse(projectService.updateEta(id, number.intValue(), latitude, longitude)));
+            return ResponseEntity.ok(toResponse(projectService.updateEta(id, etaValue.intValue(), latitude, longitude)));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -260,14 +276,29 @@ public class ProjectController {
         );
     }
 
-    private static String getString(Map<String, Object> payload, String key) {
-        Object value = payload.get(key);
-        return value instanceof String stringValue ? stringValue : null;
+    private static String getString(Map<String, Object> payload, String... keys) {
+        for (String key : keys) {
+            Object value = payload.get(key);
+            if (value instanceof String stringValue) {
+                return stringValue;
+            }
+        }
+        return null;
     }
 
     private static Double getDouble(Map<String, Object> payload, String key) {
         Object value = payload.get(key);
         return value instanceof Number numberValue ? numberValue.doubleValue() : null;
+    }
+
+    private static Number getNumber(Map<String, Object> payload, String... keys) {
+        for (String key : keys) {
+            Object value = payload.get(key);
+            if (value instanceof Number numberValue) {
+                return numberValue;
+            }
+        }
+        return null;
     }
 
     private static Boolean getBoolean(Map<String, Object> payload, String key) {

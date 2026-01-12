@@ -16,11 +16,15 @@ public class Project {
     
     private String name;
     private Double budget;
-    private String contractorId;   // references Contractor._id
+    @JsonProperty("contractor")
+    @JsonAlias("contractorId")
+    private String contractorId;
     private String address;
     private Double latitude;
     private Double longitude;
     private int progress;
+    @JsonProperty("number_of_workers")
+    @JsonAlias({"numberOfWorkers", "workers"})
     private int number_of_workers;
     private boolean finished;
 

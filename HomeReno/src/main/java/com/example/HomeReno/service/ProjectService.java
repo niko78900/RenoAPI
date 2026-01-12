@@ -36,6 +36,11 @@ public class ProjectService {
             contractorRepository.findById(contractorId)
                     .orElseThrow(() -> new RuntimeException("Contractor not found"));
         }
+        validateBudget(project.getBudget());
+        validateProgress(project.getProgress());
+        validateWorkers(project.getNumber_of_workers());
+        validateEta(project.getETA());
+        validateCoordinates(project.getLatitude(), project.getLongitude());
         return projectRepository.save(project);
     }
 
@@ -151,6 +156,7 @@ public class ProjectService {
     public Project updateBudget(String id, Double budget, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
+        validateBudget(budget);
         project.setBudget(budget);
         double workerratio = (budget / 2) / 1500;
         project.setNumber_of_workers((int) workerratio);
@@ -161,6 +167,7 @@ public class ProjectService {
 
     public Project updateWorkers(String id, Integer workers, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        validateWorkers(workers);
         project.setNumber_of_workers(workers);
         applyCoordinates(project, latitude, longitude);
         return projectRepository.save(project);
@@ -168,6 +175,7 @@ public class ProjectService {
 
     public Project updateProgress(String id, Integer progress, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        validateProgress(progress);
         project.setProgress(progress);
         applyCoordinates(project, latitude, longitude);
         return projectRepository.save(project);
@@ -175,6 +183,7 @@ public class ProjectService {
 
     public Project updateEta(String id, Integer eta, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        validateEta(eta);
         project.setETA(eta);
         applyCoordinates(project, latitude, longitude);
         return projectRepository.save(project);
@@ -192,7 +201,41 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
+    private void validateBudget(Double budget) {
+        if (budget != null && budget < 0) {
+            throw new IllegalArgumentException("budget must be >= 0");
+        }
+    }
+
+    private void validateWorkers(Integer workers) {
+        if (workers != null && workers < 0) {
+            throw new IllegalArgumentException("workers must be >= 0");
+        }
+    }
+
+    private void validateProgress(Integer progress) {
+        if (progress != null && (progress < 0 || progress > 100)) {
+            throw new IllegalArgumentException("progress must be between 0 and 100");
+        }
+    }
+
+    private void validateEta(Integer eta) {
+        if (eta != null && eta < 0) {
+            throw new IllegalArgumentException("eta must be >= 0");
+        }
+    }
+
+    private void validateCoordinates(Double latitude, Double longitude) {
+        if (latitude != null && (latitude < -90 || latitude > 90)) {
+            throw new IllegalArgumentException("latitude must be between -90 and 90");
+        }
+        if (longitude != null && (longitude < -180 || longitude > 180)) {
+            throw new IllegalArgumentException("longitude must be between -180 and 180");
+        }
+    }
+
     private void applyCoordinates(Project project, Double latitude, Double longitude) {
+        validateCoordinates(latitude, longitude);
         if (latitude != null) {
             project.setLatitude(latitude);
         }
