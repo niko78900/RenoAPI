@@ -217,8 +217,10 @@ Configuration
   - mvn spring-boot:run
 
 Security
-- An ApiKeyFilter exists but is fully commented out and not active.
-- To enable API key checks, the filter must be uncommented and api.key configured.
+- The API requires the X-API-KEY header on requests.
+- Default dev key: dev-local-key.
+- Override via application.properties (api.key=YOUR_KEY) or an environment variable (API_KEY).
+- If api.key is removed or blank, the API returns 500 on requests.
 
 Testing
 - Only a basic Spring context load test exists.

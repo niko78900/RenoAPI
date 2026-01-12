@@ -19,6 +19,13 @@ MongoDB
 - Default URI: `mongodb://localhost:27017/HomeReno`
 - Update in `HomeReno/src/main/resources/application.properties` if needed.
 
+API Key
+- Requests require the `X-API-KEY` header.
+- Default dev key: `dev-local-key` (set in `HomeReno/src/main/resources/application.properties`).
+- Override with an environment variable before running:
+  - PowerShell: `$env:API_KEY="your-key"`
+- See `.env.example` for a sample value.
+
 How to Run
 1) Start MongoDB locally.
 2) From the repo root:
