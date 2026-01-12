@@ -26,14 +26,20 @@ public class ContractorController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
     @PostMapping
-    public Contractor createContractor(@RequestBody Contractor contractor) {
-        return contractorService.createContractor(contractor);
+    public ResponseEntity<Contractor> createContractor(@RequestBody Contractor contractor) {
+        try {
+            return ResponseEntity.ok(contractorService.createContractor(contractor));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Contractor> updateContractor(@PathVariable String id, @RequestBody Contractor contractor) {
         try {
             return ResponseEntity.ok(contractorService.updateContractor(id, contractor));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }

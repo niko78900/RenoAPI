@@ -73,6 +73,10 @@ Contractors
 - GET /api/contractors/search/{name}
 - GET /api/contractors/expertise/{level}
 - GET /api/contractors/expertise (lists enum values)
+- Validation rules (400 on invalid):
+  - fullName is required and non-blank
+  - price must be >= 0
+  - expertise is required
 - POST /api/contractors
   Body:
   {
@@ -89,6 +93,7 @@ Contractors
     "expertise": "SENIOR"
   }
 - DELETE /api/contractors/{id}
+  - Clears contractorId on projects that referenced the contractor
 
 Tasks
 - GET /api/tasks

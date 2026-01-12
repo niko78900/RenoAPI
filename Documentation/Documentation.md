@@ -27,6 +27,9 @@ Project (collection: projects)
 
 Contractor (collection: contractors)
 - Fields: id, fullName, price, expertise (JUNIOR | APPRENTICE | SENIOR).
+  - fullName is required and non-blank.
+  - price must be >= 0.
+  - expertise is required.
 
 Task (collection: tasks)
 - Fields: id, projectId, name, status (NOT_STARTED | WORKING | FINISHED | CANCELED).
@@ -71,6 +74,7 @@ Validation
 Error Handling and Status Codes
 - 400: missing or invalid fields on task create/update or project patch endpoints.
 - 400: invalid ranges/coordinates or task does not belong to project on DELETE /api/projects/{projectId}/tasks/{taskId}.
+- 400: invalid contractor payloads (fullName/expertise/price).
 - 404: resource not found on most controllers that catch exceptions.
 - 404: contractor not found on project create/update.
 - 204: no content when a contractor has no projects.
@@ -166,9 +170,12 @@ Contractor API
       "price": 950,
       "expertise": "SENIOR"
     }
+  - 400 if fullName is blank, price is negative, or expertise is missing.
 - PUT /api/contractors/{id}
   - Replaces fields on the existing contractor.
+  - 400 if fullName is blank, price is negative, or expertise is missing.
 - DELETE /api/contractors/{id}
+  - Clears contractorId on any projects that referenced the contractor.
 
 Task API
 - GET /api/tasks
