@@ -293,8 +293,15 @@ public class ProjectController {
     // REMOVE TASK FROM PROJECT
     // -------------------------
     @DeleteMapping("/{projectId}/tasks/{taskId}")
-    public void removeTaskFromProject(@PathVariable String projectId, @PathVariable String taskId) {
-        projectService.removeTaskFromProject(projectId, taskId);
+    public ResponseEntity<Void> removeTaskFromProject(@PathVariable String projectId, @PathVariable String taskId) {
+        try {
+            projectService.removeTaskFromProject(projectId, taskId);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     private ProjectResponse toResponse(Project project) {

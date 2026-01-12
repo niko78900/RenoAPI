@@ -90,6 +90,13 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project was not found"));
 
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task was not found"));
+
+        if (task.getProjectId() == null || !task.getProjectId().equals(projectId)) {
+            throw new IllegalArgumentException("Task does not belong to project");
+        }
+
         List<String> taskIds = project.getTaskIds();
         if (taskIds != null) {
             taskIds.removeIf(id -> id.equals(taskId));
