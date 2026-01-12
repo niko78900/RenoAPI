@@ -20,7 +20,7 @@ Project Structure
 
 Data Model and Relationships
 Project (collection: projects)
-- Fields: id, name, budget, contractorId, address, latitude, longitude, progress, number_of_workers, finished, taskIds[], ETA.
+- Fields: id, name, budget, contractorId, address, latitude, longitude, progress, number_of_workers, finished, taskIds[], imageIds[], ETA.
 - Relationship: projectId links to tasks; contractorId links to contractors.
 - Coordinates are optional and can be set on create or patch.
 - finished is an explicit boolean flag, separate from progress.
@@ -35,7 +35,7 @@ Task (collection: tasks)
 - Fields: id, projectId, name, status (NOT_STARTED | WORKING | FINISHED | CANCELED).
 
 Image (collection: images)
-- Stored entity only; no endpoints currently expose images.
+- Fields: id, projectId, url, description, uploadedAt, uploadedBy.
 
 Source of Truth for Tasks
 - Project.taskIds is the authoritative list of tasks for a project.
@@ -44,6 +44,13 @@ Source of Truth for Tasks
 - Creating a task via /api/projects/{projectId}/tasks also writes the task and links it.
 - taskIds provided on project create are ignored.
 - Deleting a project deletes its tasks.
+
+Source of Truth for Images
+- Project.imageIds is the authoritative list of images for a project.
+- Images should always belong to a project; projectId is required for image create/update.
+- Creating/updating/deleting images via /api/images updates Project.imageIds accordingly.
+- imageIds provided on project create are ignored.
+- Deleting a project deletes its images.
 
 Field Naming (Request vs Response)
 - Project requests accept aliases:
@@ -76,6 +83,7 @@ Error Handling and Status Codes
 - 400: missing or invalid fields on task create/update or project patch endpoints.
 - 400: invalid ranges/coordinates or task does not belong to project on DELETE /api/projects/{projectId}/tasks/{taskId}.
 - 400: invalid contractor payloads (fullName/expertise/price).
+- 400: missing projectId or url on image create/update.
 - 404: resource not found on most controllers that catch exceptions.
 - 404: contractor not found on project create/update.
 - 404: project not found on DELETE /api/projects/{id}.
@@ -122,10 +130,10 @@ Project API
       "eta": 4
     }
 - Accepts contractor or contractorId, number_of_workers or numberOfWorkers or workers, eta or ETA.
-- taskIds are ignored on create.
+- taskIds and imageIds are ignored on create.
 - 404 if contractorId is invalid.
 - DELETE /api/projects/{id}
-  - Deletes a project and its tasks.
+  - Deletes a project, its tasks, and its images.
   - 404 if project is not found.
 - PATCH /api/projects/{id}/contractor
   - Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
@@ -156,7 +164,7 @@ Project API
 
 ProjectResponse Shape
 - id, name, address, latitude, longitude, budget, progress, finished,
-  numberOfWorkers, contractorId, contractorName, taskIds, eta
+  numberOfWorkers, contractorId, contractorName, taskIds, imageIds, eta
 - contractorName is derived by lookup; if contractorId is missing or invalid, it is null.
 
 Contractor API
@@ -203,6 +211,27 @@ Task API
 - DELETE /api/tasks/{id}
   - 204 on success, 404 if not found.
   - Also removes the task ID from the owning project.
+
+Image API
+- GET /api/images
+- GET /api/images/{id}
+- GET /api/images/project/{projectId}
+- POST /api/images
+  - Requires projectId and url and links the image to the project.
+  - 200 on success, 400 for missing projectId/url, 404 if projectId not found.
+  - Example body:
+    {
+      "projectId": "PROJECT_ID_HERE",
+      "url": "https://example.com/image.jpg",
+      "description": "Front elevation",
+      "uploadedBy": "jane.builder"
+    }
+- PUT /api/images/{id}
+  - Replaces the image fields and can move the image to a different projectId.
+  - 200 on success, 400 for missing projectId/url, 404 if image or project not found.
+- DELETE /api/images/{id}
+  - 204 on success, 404 if not found.
+  - Also removes the image ID from the owning project.
 
 Seed Data (Development Only)
 - DataInitializer clears all collections and inserts sample contractors, projects, and tasks.

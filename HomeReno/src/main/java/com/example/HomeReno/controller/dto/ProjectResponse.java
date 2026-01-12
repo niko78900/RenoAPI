@@ -15,5 +15,6 @@ public record ProjectResponse(
         String contractorId,
         String contractorName,
         List<String> taskIds,
+        List<String> imageIds,
         int eta
 ) {}

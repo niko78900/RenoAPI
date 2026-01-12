@@ -1,9 +1,11 @@
 package com.example.HomeReno.service;
 
 
+import com.example.HomeReno.entity.Image;
 import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.repository.ContractorRepository;
+import com.example.HomeReno.repository.ImageRepository;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class ProjectService {
     @Autowired
     private ContractorRepository contractorRepository;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     public List<Project> getAllProjects(){
         return projectRepository.findAll();
     }
@@ -42,6 +47,7 @@ public class ProjectService {
         validateEta(project.getETA());
         validateCoordinates(project.getLatitude(), project.getLongitude());
         project.setTaskIds(new ArrayList<>());
+        project.setImageIds(new ArrayList<>());
         return projectRepository.save(project);
     }
 
@@ -87,6 +93,10 @@ public class ProjectService {
         List<Task> tasks = taskRepository.findByProjectId(id);
         if (!tasks.isEmpty()) {
             taskRepository.deleteAll(tasks);
+        }
+        List<Image> images = imageRepository.findByProjectId(id);
+        if (!images.isEmpty()) {
+            imageRepository.deleteAll(images);
         }
         projectRepository.deleteById(id);
     }

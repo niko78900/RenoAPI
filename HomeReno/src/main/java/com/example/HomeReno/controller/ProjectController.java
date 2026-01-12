@@ -264,6 +264,7 @@ public class ProjectController {
                     .map(c -> c.getFullName());
         }
         List<String> taskIds = project.getTaskIds();
+        List<String> imageIds = project.getImageIds();
         return new ProjectResponse(
                 project.getId(),
                 project.getName(),
@@ -277,6 +278,7 @@ public class ProjectController {
                 contractorId,
                 contractorName.orElse(null),
                 taskIds,
+                imageIds,
                 project.getETA()
         );
     }

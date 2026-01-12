@@ -41,8 +41,8 @@ Projects
     "taskIds": [],
     "eta": 4
   }
-- taskIds are ignored on create
-- DELETE /api/projects/{id} (deletes project and its tasks, 404 if project not found)
+- taskIds and imageIds are ignored on create
+- DELETE /api/projects/{id} (deletes project, tasks, and images, 404 if project not found)
 - PATCH /api/projects/{id}/contractor
   Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
   (contractor is also accepted in place of contractorId)
@@ -71,6 +71,28 @@ Projects
   }
 - DELETE /api/projects/{projectId}/tasks/{taskId}
   - 400 if the task does not belong to the project
+
+Images
+- GET /api/images
+- GET /api/images/{id}
+- GET /api/images/project/{projectId}
+- POST /api/images
+  Body:
+  {
+    "projectId": "PROJECT_ID_HERE",
+    "url": "https://example.com/image.jpg",
+    "description": "Front elevation",
+    "uploadedBy": "jane.builder"
+  }
+- PUT /api/images/{id}
+  Body:
+  {
+    "projectId": "PROJECT_ID_HERE",
+    "url": "https://example.com/image.jpg",
+    "description": "Updated description",
+    "uploadedBy": "jane.builder"
+  }
+- DELETE /api/images/{id}
 
 Contractors
 - GET /api/contractors

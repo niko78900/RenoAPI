@@ -29,6 +29,7 @@ public class Project {
     private boolean finished;
 
     private List<String> taskIds = new ArrayList<>();
+    private List<String> imageIds = new ArrayList<>();
     @JsonProperty("eta")
     @JsonAlias("ETA")
     private int ETA;
@@ -92,6 +93,14 @@ public class Project {
         taskIds.add(taskId);
     }
 
+    public void setImageIds(List<String> imageIds) {
+        this.imageIds = imageIds;
+    }
+
+    public void addImageToList(String imageId){
+        imageIds.add(imageId);
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -122,6 +131,10 @@ public class Project {
 
     public List<String> getTaskIds() {
         return taskIds;
+    }
+
+    public List<String> getImageIds() {
+        return imageIds;
     }
 
     public String getName() {
