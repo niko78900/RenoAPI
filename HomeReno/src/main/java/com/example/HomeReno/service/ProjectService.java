@@ -3,6 +3,7 @@ package com.example.HomeReno.service;
 
 import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
+import com.example.HomeReno.repository.ContractorRepository;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,19 @@ public class ProjectService {
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private ContractorRepository contractorRepository;
+
     public List<Project> getAllProjects(){
         return projectRepository.findAll();
     }
 
     public Project createProject(Project project){
+        String contractorId = project.getContractor();
+        if (contractorId != null && !contractorId.isBlank()) {
+            contractorRepository.findById(contractorId)
+                    .orElseThrow(() -> new RuntimeException("Contractor not found"));
+        }
         return projectRepository.save(project);
     }
 
@@ -113,6 +122,8 @@ public class ProjectService {
     public Project updateContractor(String id, String contractorId, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found"));
 
+        contractorRepository.findById(contractorId)
+                .orElseThrow(() -> new RuntimeException("Contractor not found"));
         project.setContractor(contractorId);
         applyCoordinates(project, latitude, longitude);
 

@@ -80,8 +80,12 @@ public class ProjectController {
         }
     }
     @PostMapping
-    public ProjectResponse createProject(@RequestBody Project project) {
-        return toResponse(projectService.createProject(project));
+    public ResponseEntity<ProjectResponse> createProject(@RequestBody Project project) {
+        try {
+            return ResponseEntity.ok(toResponse(projectService.createProject(project)));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
     @DeleteMapping("/{id}")
     public void deleteProject(@PathVariable String id) {
