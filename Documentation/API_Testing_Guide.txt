@@ -15,6 +15,13 @@ Projects
 - Project responses include latitude/longitude (nullable).
 - Project responses include a finished flag (boolean).
 - Latitude/longitude are optional in POST and PATCH bodies; omit to keep current coordinates.
+- Request field aliases are accepted:
+  - contractor or contractorId
+  - number_of_workers, numberOfWorkers, or workers
+  - eta or ETA
+- Validation rules (400 on invalid):
+  - budget >= 0, workers >= 0, eta >= 0, progress between 0 and 100
+  - latitude between -90 and 90, longitude between -180 and 180
 - POST /api/projects
   Body:
   {
@@ -30,8 +37,10 @@ Projects
     "taskIds": [],
     "eta": 4
   }
+- DELETE /api/projects/{id} (deletes project and its tasks)
 - PATCH /api/projects/{id}/contractor
   Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
+  (contractor is also accepted in place of contractorId)
 - PATCH /api/projects/{id}/contractor/remove
 - PATCH /api/projects/{id}/address
   Body: { "address": "456 Updated Avenue", "latitude": 41.9982, "longitude": 21.4254 }
@@ -41,12 +50,14 @@ Projects
   Body: { "budget": 82000, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/workers
   Body: { "workers": 18, "latitude": 41.9982, "longitude": 21.4254 }
+  (number_of_workers or numberOfWorkers are also accepted in place of workers)
 - PATCH /api/projects/{id}/progress
   Body: { "progress": 65, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/finished
   Body: { "finished": true }
 - PATCH /api/projects/{id}/eta
   Body: { "eta": 3, "latitude": 41.9982, "longitude": 21.4254 }
+  (ETA is also accepted in place of eta)
 - POST /api/projects/{projectId}/tasks
   Body:
   {
@@ -54,6 +65,7 @@ Projects
     "status": "NOT_STARTED"
   }
 - DELETE /api/projects/{projectId}/tasks/{taskId}
+  - 400 if the task does not belong to the project
 
 Contractors
 - GET /api/contractors

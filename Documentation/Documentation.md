@@ -39,13 +39,13 @@ Source of Truth for Tasks
 - Tasks should always belong to a project; projectId is required for task create/update.
 - Creating/updating/deleting tasks via /api/tasks updates Project.taskIds accordingly.
 - Creating a task via /api/projects/{projectId}/tasks also writes the task and links it.
-- Deleting a project does not currently delete its tasks; those tasks remain in the tasks collection.
+- Deleting a project deletes its tasks.
 
 Field Naming (Request vs Response)
-- Project requests use the Project entity field names:
-  - contractor (not contractorId)
-  - number_of_workers (snake case)
-  - ETA (represented as eta in most clients and docs)
+- Project requests accept aliases:
+  - contractor or contractorId
+  - number_of_workers, numberOfWorkers, or workers
+  - eta or ETA
 - Project responses use ProjectResponse:
   - contractorId and contractorName
   - numberOfWorkers (camel case)
@@ -57,15 +57,23 @@ Derived and Automatic Behavior
 - On API create, number_of_workers is whatever the client supplies (no server default).
 - finished is updated only by the dedicated finished endpoint.
 - Latitude/longitude patches are optional; omitted values do not overwrite existing coordinates.
-- Progress is intended to be 0-100 but is not validated by the API.
+- Progress is intended to be 0-100.
+
+Validation
+- budget must be >= 0.
+- number_of_workers/workers must be >= 0.
+- eta must be >= 0.
+- progress must be between 0 and 100.
+- latitude must be between -90 and 90.
+- longitude must be between -180 and 180.
+- Invalid values return 400.
 
 Error Handling and Status Codes
 - 400: missing or invalid fields on task create/update or project patch endpoints.
+- 400: invalid ranges/coordinates or task does not belong to project on DELETE /api/projects/{projectId}/tasks/{taskId}.
 - 404: resource not found on most controllers that catch exceptions.
+- 404: contractor not found on project create/update.
 - 204: no content when a contractor has no projects.
-- Some endpoints do not catch runtime exceptions and may return 500 if the ID is invalid:
-  - GET /api/projects/timeline/{id}
-  - DELETE /api/projects/{id}/tasks/{taskId}
 
 API Endpoints
 Project API
@@ -81,6 +89,7 @@ Project API
   - 200 with list or 204 if none.
 - GET /api/projects/timeline/{id}
   - Returns a summary map with string keys and values.
+  - 404 if project is not found.
   - Example response:
     {
       "ID": "PROJECT_ID",
@@ -106,10 +115,13 @@ Project API
       "taskIds": [],
       "eta": 4
     }
+- Accepts contractor or contractorId, number_of_workers or numberOfWorkers or workers, eta or ETA.
+- 404 if contractorId is invalid.
 - DELETE /api/projects/{id}
-  - Deletes a project (no task cascade).
+  - Deletes a project and its tasks.
 - PATCH /api/projects/{id}/contractor
   - Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
+  - contractor is also accepted in place of contractorId.
 - PATCH /api/projects/{id}/contractor/remove
   - Clears contractorId.
 - PATCH /api/projects/{id}/address
@@ -120,16 +132,19 @@ Project API
   - Body: { "budget": 82000, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/workers
   - Body: { "workers": 18, "latitude": 41.9982, "longitude": 21.4254 }
+  - number_of_workers or numberOfWorkers are also accepted in place of workers.
 - PATCH /api/projects/{id}/progress
   - Body: { "progress": 65, "latitude": 41.9982, "longitude": 21.4254 }
 - PATCH /api/projects/{id}/eta
   - Body: { "eta": 3, "latitude": 41.9982, "longitude": 21.4254 }
+  - ETA is also accepted in place of eta.
 - PATCH /api/projects/{id}/finished
   - Body: { "finished": true }
 - POST /api/projects/{projectId}/tasks
   - Creates a task and links it to the project.
 - DELETE /api/projects/{projectId}/tasks/{taskId}
   - Removes a task from the project and deletes it.
+  - 400 if the task does not belong to the project.
 
 ProjectResponse Shape
 - id, name, address, latitude, longitude, budget, progress, finished,
