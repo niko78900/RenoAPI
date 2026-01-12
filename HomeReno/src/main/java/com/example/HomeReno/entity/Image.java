@@ -17,8 +17,6 @@ public class Image {
     private String description;
     private LocalDateTime uploadedAt;
     private String uploadedBy;
-
-    // Constructors
     public Image() {}
 
     public Image(String projectId, String url, String description, String uploadedBy) {
@@ -28,8 +26,6 @@ public class Image {
         this.uploadedBy = uploadedBy;
         this.uploadedAt = LocalDateTime.now();
     }
-
-    // Getters and Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 

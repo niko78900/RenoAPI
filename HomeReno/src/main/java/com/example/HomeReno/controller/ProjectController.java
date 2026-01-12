@@ -24,10 +24,6 @@ public class ProjectController {
 
     @Autowired
     private ContractorService contractorService;
-
-    // -------------------------
-    // GET ALL PROJECTS
-    // -------------------------
     @GetMapping
     public List<ProjectResponse> getAllProjects() {
         return projectService.getAllProjects()
@@ -35,40 +31,24 @@ public class ProjectController {
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
-
-    // -------------------------
-    // GET PROJECT BY ID
-    // -------------------------
     @GetMapping("/{id}")
     public ResponseEntity<ProjectResponse> getProjectById(@PathVariable String id) {
         return projectService.getProjectById(id)
                 .map(project -> ResponseEntity.ok(toResponse(project)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-    // -------------------------
-    // GET PROJECT BY ADDRESS
-    // -------------------------
     @GetMapping("/adr/{address}")
     public ResponseEntity<ProjectResponse> getProjectByAddress(@PathVariable String address) {
         return projectService.getProjectByAddress(address)
                 .map(project -> ResponseEntity.ok(toResponse(project)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-    // -------------------------
-    // GET PROJECT BY NAME
-    // -------------------------
     @GetMapping("/name/{name}")
     public ResponseEntity<ProjectResponse> getProjectByName(@PathVariable String name) {
         return projectService.getProjectByName(name)
                 .map(project -> ResponseEntity.ok(toResponse(project)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
-    // -------------------------
-    // GET PROJECT FINISHED FLAG ONLY
-    // -------------------------
     @GetMapping("/{id}/finished")
     public ResponseEntity<Map<String, Boolean>> getFinishedFlag(@PathVariable String id) {
         try {
@@ -78,10 +58,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // GET BY CONTRACTOR
-    // -------------------------
     @GetMapping("/contractor/{contractorId}")
     public ResponseEntity<List<ProjectResponse>> getProjectsByContractor(@PathVariable String contractorId) {
         List<ProjectResponse> projects = projectService.getProjectsByContractorId(contractorId)
@@ -92,10 +68,6 @@ public class ProjectController {
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(projects);
     }
-
-    // -------------------------
-    // TIMELINE
-    // -------------------------
     @GetMapping("/timeline/{id}")
     public ResponseEntity<Map<String, Object>> getTimeLine(@PathVariable String id) {
         try {
@@ -107,26 +79,14 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // CREATE PROJECT
-    // -------------------------
     @PostMapping
     public ProjectResponse createProject(@RequestBody Project project) {
         return toResponse(projectService.createProject(project));
     }
-
-    // -------------------------
-    // DELETE PROJECT
-    // -------------------------
     @DeleteMapping("/{id}")
     public void deleteProject(@PathVariable String id) {
         projectService.deleteProject(id);
     }
-
-    // -------------------------
-    // UPDATE PROJECT CONTRACTOR
-    // -------------------------
     @PatchMapping("/{id}/contractor")
     public ResponseEntity<ProjectResponse> updateProjectContractor(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         String contractorId = getString(payload, "contractorId");
@@ -141,10 +101,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE ADDRESS
-    // -------------------------
     @PatchMapping("/{id}/address")
     public ResponseEntity<ProjectResponse> updateProjectAddress(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         String address = getString(payload, "address");
@@ -159,10 +115,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE NAME
-    // -------------------------
     @PatchMapping("/{id}/name")
     public ResponseEntity<ProjectResponse> updateProjectName(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         String name = getString(payload, "name");
@@ -177,10 +129,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE BUDGET
-    // -------------------------
     @PatchMapping("/{id}/budget")
     public ResponseEntity<ProjectResponse> updateProjectBudget(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         Object budgetValue = payload.get("budget");
@@ -195,10 +143,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE WORKER COUNT
-    // -------------------------
     @PatchMapping("/{id}/workers")
     public ResponseEntity<ProjectResponse> updateProjectWorkers(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         Object workersValue = payload.get("workers");
@@ -213,10 +157,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE PROGRESS
-    // -------------------------
     @PatchMapping("/{id}/progress")
     public ResponseEntity<ProjectResponse> updateProjectProgress(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         Object progressValue = payload.get("progress");
@@ -231,10 +171,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE ETA
-    // -------------------------
     @PatchMapping("/{id}/eta")
     public ResponseEntity<ProjectResponse> updateProjectEta(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         Object etaValue = payload.get("eta");
@@ -249,10 +185,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // UPDATE FINISHED FLAG
-    // -------------------------
     @PatchMapping("/{id}/finished")
     public ResponseEntity<ProjectResponse> updateFinishedFlag(@PathVariable String id, @RequestBody Map<String, Object> payload) {
         Boolean finished = getBoolean(payload, "finished");
@@ -265,10 +197,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // REMOVE CONTRACTOR
-    // -------------------------
     @PatchMapping("/{id}/contractor/remove")
     public ResponseEntity<ProjectResponse> removeProjectContractor(@PathVariable String id) {
         try {
@@ -277,10 +205,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // ADD TASK TO PROJECT
-    // -------------------------
     @PostMapping("/{projectId}/tasks")
     public ResponseEntity<ProjectResponse> addTaskToProject(
             @PathVariable String projectId,
@@ -292,10 +216,6 @@ public class ProjectController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    // -------------------------
-    // REMOVE TASK FROM PROJECT
-    // -------------------------
     @DeleteMapping("/{projectId}/tasks/{taskId}")
     public ResponseEntity<Void> removeTaskFromProject(@PathVariable String projectId, @PathVariable String taskId) {
         try {

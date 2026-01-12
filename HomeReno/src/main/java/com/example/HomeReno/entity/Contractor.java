@@ -10,7 +10,7 @@ public class Contractor {
     private String id;
 
     private String fullName; 
-    private Double price;      //per project
+    private Double price;
     private Expertise expertise;
 
     public enum Expertise {

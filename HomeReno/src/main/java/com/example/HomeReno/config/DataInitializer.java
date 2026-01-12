@@ -19,7 +19,6 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initData(ProjectRepository projectRepo, TaskRepository taskRepo, ContractorRepository contractorRepository) {
         return args -> {
-            // Clear DB
             projectRepo.deleteAll();
             taskRepo.deleteAll();
             contractorRepository.deleteAll();
