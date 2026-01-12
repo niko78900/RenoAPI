@@ -3,8 +3,10 @@ package com.example.HomeReno.controller;
 import com.example.HomeReno.entity.Image;
 import com.example.HomeReno.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,6 +40,22 @@ public class ImageController {
             return ResponseEntity.ok(imageService.createImage(image));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Image> uploadImage(@RequestParam("projectId") String projectId,
+                                             @RequestParam("file") MultipartFile file,
+                                             @RequestParam(value = "description", required = false) String description,
+                                             @RequestParam(value = "uploadedBy", required = false) String uploadedBy) {
+        try {
+            return ResponseEntity.ok(imageService.createImageUpload(projectId, file, description, uploadedBy));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
+        } catch (IllegalStateException ex) {
+            return ResponseEntity.internalServerError().build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }

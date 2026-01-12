@@ -31,6 +31,9 @@ public class ProjectService {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private FileStorageService fileStorageService;
+
     public List<Project> getAllProjects(){
         return projectRepository.findAll();
     }
@@ -96,6 +99,9 @@ public class ProjectService {
         }
         List<Image> images = imageRepository.findByProjectId(id);
         if (!images.isEmpty()) {
+            for (Image image : images) {
+                fileStorageService.deleteIfLocal(image.getUrl());
+            }
             imageRepository.deleteAll(images);
         }
         projectRepository.deleteById(id);

@@ -36,6 +36,7 @@ Task (collection: tasks)
 
 Image (collection: images)
 - Fields: id, projectId, url, description, uploadedAt, uploadedBy.
+- url stores the public path to the file (for local uploads, /uploads/<filename>).
 
 Source of Truth for Tasks
 - Project.taskIds is the authoritative list of tasks for a project.
@@ -51,6 +52,7 @@ Source of Truth for Images
 - Creating/updating/deleting images via /api/images updates Project.imageIds accordingly.
 - imageIds provided on project create are ignored.
 - Deleting a project deletes its images.
+- Uploads are stored on disk and served from /uploads/**.
 
 Field Naming (Request vs Response)
 - Project requests accept aliases:
@@ -84,6 +86,7 @@ Error Handling and Status Codes
 - 400: invalid ranges/coordinates or task does not belong to project on DELETE /api/projects/{projectId}/tasks/{taskId}.
 - 400: invalid contractor payloads (fullName/expertise/price).
 - 400: missing projectId or url on image create/update.
+- 400: missing projectId/file or non-image upload on POST /api/images/upload.
 - 404: resource not found on most controllers that catch exceptions.
 - 404: contractor not found on project create/update.
 - 404: project not found on DELETE /api/projects/{id}.
@@ -226,6 +229,9 @@ Image API
       "description": "Front elevation",
       "uploadedBy": "jane.builder"
     }
+- POST /api/images/upload (multipart/form-data)
+  - Fields: projectId (required), file (required), description (optional), uploadedBy (optional).
+  - 200 on success, 400 for missing projectId/file or non-image upload, 404 if projectId not found.
 - PUT /api/images/{id}
   - Replaces the image fields and can move the image to a different projectId.
   - 200 on success, 400 for missing projectId/url, 404 if image or project not found.
@@ -242,6 +248,8 @@ Configuration
   - spring.application.name=HomeReno
   - server.port=8080
   - spring.data.mongodb.uri=mongodb://localhost:27017/HomeReno
+  - storage.upload-dir=uploads
+  - storage.url-prefix=/uploads/
 - Start the server with:
   - mvn spring-boot:run
 
@@ -250,6 +258,7 @@ Security
 - Default dev key: dev-local-key.
 - Override via application.properties (api.key=YOUR_KEY) or an environment variable (API_KEY).
 - If api.key is removed or blank, the API returns 500 on requests.
+- Static file serving under /uploads/** is public and does not require an API key.
 
 Testing
 - Only a basic Spring context load test exists.

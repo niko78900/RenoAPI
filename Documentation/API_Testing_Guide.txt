@@ -7,6 +7,7 @@ Base URL: http://localhost:8080
 Auth
 - All requests require the X-API-KEY header.
 - Default dev key: dev-local-key.
+- Static files under /uploads/** are public and do not require the API key.
 
 Projects
 - GET /api/projects
@@ -84,6 +85,20 @@ Images
     "description": "Front elevation",
     "uploadedBy": "jane.builder"
   }
+- POST /api/images/upload (multipart/form-data)
+  Fields:
+  - projectId (text, required)
+  - file (file, required)
+  - description (text, optional)
+  - uploadedBy (text, optional)
+  Example curl:
+  curl -X POST http://localhost:8080/api/images/upload \
+    -H "X-API-KEY: dev-local-key" \
+    -F "projectId=PROJECT_ID_HERE" \
+    -F "file=@./path/to/image.jpg" \
+    -F "description=Front elevation" \
+    -F "uploadedBy=jane.builder"
+  The returned url can be opened directly (http://localhost:8080/uploads/<filename>).
 - PUT /api/images/{id}
   Body:
   {

@@ -6,6 +6,7 @@ import com.example.HomeReno.repository.ImageRepository;
 import com.example.HomeReno.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,9 @@ public class ImageService {
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     public List<Image> getAllImages() {
         return imageRepository.findAll();
@@ -39,6 +43,24 @@ public class ImageService {
         if (image.getUploadedAt() == null) {
             image.setUploadedAt(LocalDateTime.now());
         }
+        Image savedImage = imageRepository.save(image);
+        linkImageToProject(project, savedImage.getId());
+        return savedImage;
+    }
+
+    public Image createImageUpload(String projectId, MultipartFile file, String description, String uploadedBy) {
+        if (projectId == null || projectId.isBlank()) {
+            throw new IllegalArgumentException("projectId is required");
+        }
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        String url = fileStorageService.storeImage(file);
+        Image image = new Image();
+        image.setProjectId(projectId);
+        image.setUrl(url);
+        image.setDescription(description);
+        image.setUploadedBy(uploadedBy);
+        image.setUploadedAt(LocalDateTime.now());
         Image savedImage = imageRepository.save(image);
         linkImageToProject(project, savedImage.getId());
         return savedImage;
@@ -94,6 +116,7 @@ public class ImageService {
                         }
                     });
         }
+        fileStorageService.deleteIfLocal(image.getUrl());
         imageRepository.deleteById(id);
     }
 
