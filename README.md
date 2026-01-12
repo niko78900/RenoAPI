@@ -25,6 +25,7 @@ API Key
 - Override with an environment variable before running:
   - PowerShell: `$env:API_KEY="your-key"`
 - See `.env.example` for a sample value.
+- The dev key is intentionally committed to make demos easy; replace for production.
 
 How to Run
 1) Start MongoDB locally.
