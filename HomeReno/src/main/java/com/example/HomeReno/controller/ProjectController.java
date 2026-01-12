@@ -98,10 +98,14 @@ public class ProjectController {
     // -------------------------
     @GetMapping("/timeline/{id}")
     public ResponseEntity<Map<String, Object>> getTimeLine(@PathVariable String id) {
-        Map<String, Object> response = projectService.getTimeline(id);
-        return response.isEmpty()
-                ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(response);
+        try {
+            Map<String, Object> response = projectService.getTimeline(id);
+            return response.isEmpty()
+                    ? ResponseEntity.noContent().build()
+                    : ResponseEntity.ok(response);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // -------------------------
