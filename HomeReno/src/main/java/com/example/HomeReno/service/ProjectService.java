@@ -67,6 +67,10 @@ public class ProjectService {
     }
 
     public void deleteProject(String id){
+        List<Task> tasks = taskRepository.findByProjectId(id);
+        if (!tasks.isEmpty()) {
+            taskRepository.deleteAll(tasks);
+        }
         projectRepository.deleteById(id);
     }
 
