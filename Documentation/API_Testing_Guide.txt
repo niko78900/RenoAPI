@@ -91,6 +91,9 @@ Images
   - file (file, required)
   - description (text, optional)
   - uploadedBy (text, optional)
+  Notes:
+  - Uploads must be valid image files; spoofed content types return 400.
+  - Max 50 images per project; additional uploads return 400.
   Example curl:
   curl -X POST http://localhost:8080/api/images/upload \
     -H "X-API-KEY: dev-local-key" \

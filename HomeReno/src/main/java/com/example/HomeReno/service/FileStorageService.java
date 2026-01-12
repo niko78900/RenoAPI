@@ -5,12 +5,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.UUID;
+
+import javax.imageio.ImageIO;
 
 @Service
 public class FileStorageService {
@@ -29,9 +32,11 @@ public class FileStorageService {
             throw new IllegalArgumentException("file is required");
         }
         String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
+        if (contentType != null && !contentType.startsWith("image/")) {
             throw new IllegalArgumentException("file must be an image");
         }
+        byte[] bytes = readBytes(file);
+        validateImageBytes(bytes);
         String originalFilename = file.getOriginalFilename();
         String cleanedFilename = originalFilename == null ? "" : StringUtils.cleanPath(originalFilename);
         String extension = "";
@@ -44,7 +49,7 @@ public class FileStorageService {
         try {
             Files.createDirectories(uploadPath);
             Path target = uploadPath.resolve(filename).normalize();
-            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+            Files.write(target, bytes);
         } catch (IOException ex) {
             throw new IllegalStateException("Failed to store image file", ex);
         }
@@ -79,6 +84,28 @@ public class FileStorageService {
     private Path getUploadPath() {
         String dir = uploadDir == null || uploadDir.isBlank() ? "uploads" : uploadDir;
         return Paths.get(dir).toAbsolutePath().normalize();
+    }
+
+    private byte[] readBytes(MultipartFile file) {
+        try {
+            return file.getBytes();
+        } catch (IOException ex) {
+            throw new IllegalStateException("Failed to read image file", ex);
+        }
+    }
+
+    private void validateImageBytes(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            throw new IllegalArgumentException("file is required");
+        }
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
+            BufferedImage image = ImageIO.read(inputStream);
+            if (image == null) {
+                throw new IllegalArgumentException("file must be a valid image");
+            }
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("file must be a valid image", ex);
+        }
     }
 
     private String normalizeUrlPrefix(String prefix) {

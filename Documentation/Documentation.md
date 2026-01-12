@@ -79,6 +79,8 @@ Validation
 - progress must be between 0 and 100.
 - latitude must be between -90 and 90.
 - longitude must be between -180 and 180.
+- images per project must be <= 50.
+- uploaded files must decode as valid images (content type is not trusted).
 - Invalid values return 400.
 
 Error Handling and Status Codes
@@ -86,7 +88,7 @@ Error Handling and Status Codes
 - 400: invalid ranges/coordinates or task does not belong to project on DELETE /api/projects/{projectId}/tasks/{taskId}.
 - 400: invalid contractor payloads (fullName/expertise/price).
 - 400: missing projectId or url on image create/update.
-- 400: missing projectId/file or non-image upload on POST /api/images/upload.
+- 400: missing projectId/file, invalid image, or limit exceeded on POST /api/images/upload.
 - 404: resource not found on most controllers that catch exceptions.
 - 404: contractor not found on project create/update.
 - 404: project not found on DELETE /api/projects/{id}.
@@ -231,13 +233,14 @@ Image API
     }
 - POST /api/images/upload (multipart/form-data)
   - Fields: projectId (required), file (required), description (optional), uploadedBy (optional).
-  - 200 on success, 400 for missing projectId/file or non-image upload, 404 if projectId not found.
+  - 200 on success, 400 for missing projectId/file, invalid image, or limit exceeded, 404 if projectId not found.
 - PUT /api/images/{id}
   - Replaces the image fields and can move the image to a different projectId.
   - 200 on success, 400 for missing projectId/url, 404 if image or project not found.
 - DELETE /api/images/{id}
   - 204 on success, 404 if not found.
   - Also removes the image ID from the owning project.
+- Max 50 images per project.
 
 Seed Data (Development Only)
 - DataInitializer clears all collections and inserts sample contractors, projects, and tasks.
@@ -261,8 +264,8 @@ Security
 - Static file serving under /uploads/** is public and does not require an API key.
 
 Testing
-- Only a basic Spring context load test exists.
-- No integration or controller tests are currently included.
+- WebMvc tests cover API key enforcement and image endpoints.
+- Service unit tests cover contractor and project validation.
 
 Related Docs
 - Documentation/API_Testing_Guide.txt includes ready-to-use request bodies and quick testing steps.

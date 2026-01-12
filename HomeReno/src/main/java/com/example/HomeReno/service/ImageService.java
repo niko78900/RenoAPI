@@ -15,6 +15,8 @@ import java.util.Optional;
 
 @Service
 public class ImageService {
+    private static final int MAX_IMAGES_PER_PROJECT = 50;
+
     @Autowired
     private ImageRepository imageRepository;
 
@@ -40,6 +42,7 @@ public class ImageService {
         validateImage(image);
         Project project = projectRepository.findById(image.getProjectId())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
+        ensureImageCapacity(project, null);
         if (image.getUploadedAt() == null) {
             image.setUploadedAt(LocalDateTime.now());
         }
@@ -54,6 +57,7 @@ public class ImageService {
         }
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
+        ensureImageCapacity(project, null);
         String url = fileStorageService.storeImage(file);
         Image image = new Image();
         image.setProjectId(projectId);
@@ -74,6 +78,9 @@ public class ImageService {
                     String nextProjectId = image.getProjectId();
                     Project nextProject = projectRepository.findById(nextProjectId)
                             .orElseThrow(() -> new RuntimeException("Project not found"));
+                    if (previousProjectId == null || !previousProjectId.equals(nextProjectId)) {
+                        ensureImageCapacity(nextProject, existing.getId());
+                    }
 
                     existing.setProjectId(nextProjectId);
                     existing.setUrl(image.getUrl());
@@ -143,6 +150,15 @@ public class ImageService {
         if (!imageIds.contains(imageId)) {
             imageIds.add(imageId);
             projectRepository.save(project);
+        }
+    }
+
+    private void ensureImageCapacity(Project project, String imageId) {
+        List<String> imageIds = project.getImageIds();
+        int size = imageIds == null ? 0 : imageIds.size();
+        boolean alreadyLinked = imageId != null && imageIds != null && imageIds.contains(imageId);
+        if (!alreadyLinked && size >= MAX_IMAGES_PER_PROJECT) {
+            throw new IllegalArgumentException("project has reached image limit");
         }
     }
 }
