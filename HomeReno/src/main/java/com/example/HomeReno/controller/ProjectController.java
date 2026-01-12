@@ -90,8 +90,13 @@ public class ProjectController {
         }
     }
     @DeleteMapping("/{id}")
-    public void deleteProject(@PathVariable String id) {
-        projectService.deleteProject(id);
+    public ResponseEntity<Void> deleteProject(@PathVariable String id) {
+        try {
+            projectService.deleteProject(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
     }
     @PatchMapping("/{id}/contractor")
     public ResponseEntity<ProjectResponse> updateProjectContractor(@PathVariable String id, @RequestBody Map<String, Object> payload) {

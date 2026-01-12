@@ -37,7 +37,8 @@ Projects
     "taskIds": [],
     "eta": 4
   }
-- DELETE /api/projects/{id} (deletes project and its tasks)
+- taskIds are ignored on create
+- DELETE /api/projects/{id} (deletes project and its tasks, 404 if project not found)
 - PATCH /api/projects/{id}/contractor
   Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
   (contractor is also accepted in place of contractorId)

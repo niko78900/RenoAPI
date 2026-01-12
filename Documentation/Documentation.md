@@ -42,6 +42,7 @@ Source of Truth for Tasks
 - Tasks should always belong to a project; projectId is required for task create/update.
 - Creating/updating/deleting tasks via /api/tasks updates Project.taskIds accordingly.
 - Creating a task via /api/projects/{projectId}/tasks also writes the task and links it.
+- taskIds provided on project create are ignored.
 - Deleting a project deletes its tasks.
 
 Field Naming (Request vs Response)
@@ -77,6 +78,7 @@ Error Handling and Status Codes
 - 400: invalid contractor payloads (fullName/expertise/price).
 - 404: resource not found on most controllers that catch exceptions.
 - 404: contractor not found on project create/update.
+- 404: project not found on DELETE /api/projects/{id}.
 - 204: no content when a contractor has no projects.
 
 API Endpoints
@@ -120,9 +122,11 @@ Project API
       "eta": 4
     }
 - Accepts contractor or contractorId, number_of_workers or numberOfWorkers or workers, eta or ETA.
+- taskIds are ignored on create.
 - 404 if contractorId is invalid.
 - DELETE /api/projects/{id}
   - Deletes a project and its tasks.
+  - 404 if project is not found.
 - PATCH /api/projects/{id}/contractor
   - Body: { "contractorId": "NEW_CONTRACTOR_ID", "latitude": 41.9982, "longitude": 21.4254 }
   - contractor is also accepted in place of contractorId.

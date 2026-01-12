@@ -41,6 +41,7 @@ public class ProjectService {
         validateWorkers(project.getNumber_of_workers());
         validateEta(project.getETA());
         validateCoordinates(project.getLatitude(), project.getLongitude());
+        project.setTaskIds(new ArrayList<>());
         return projectRepository.save(project);
     }
 
@@ -81,6 +82,8 @@ public class ProjectService {
     }
 
     public void deleteProject(String id){
+        projectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
         List<Task> tasks = taskRepository.findByProjectId(id);
         if (!tasks.isEmpty()) {
             taskRepository.deleteAll(tasks);
