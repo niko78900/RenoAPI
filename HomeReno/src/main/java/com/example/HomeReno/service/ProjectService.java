@@ -8,6 +8,8 @@ import com.example.HomeReno.repository.ContractorRepository;
 import com.example.HomeReno.repository.ImageRepository;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
+import com.example.HomeReno.security.SecurityUtils;
+import com.example.HomeReno.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -36,10 +38,15 @@ public class ProjectService {
     private FileStorageService fileStorageService;
 
     public List<Project> getAllProjects(){
-        return projectRepository.findAll();
+        UserPrincipal currentUser = SecurityUtils.requireUser();
+        if (currentUser.isAdmin()) {
+            return projectRepository.findAll();
+        }
+        return projectRepository.findByOwnerId(currentUser.getId());
     }
 
     public Project createProject(Project project){
+        UserPrincipal currentUser = SecurityUtils.requireUser();
         String contractorId = project.getContractor();
         if (contractorId != null && !contractorId.isBlank()) {
             contractorRepository.findById(contractorId)
@@ -50,30 +57,40 @@ public class ProjectService {
         validateWorkers(project.getNumber_of_workers());
         validateEta(project.getETA());
         validateCoordinates(project.getLatitude(), project.getLongitude());
+        project.setOwnerId(currentUser.getId());
         project.setTaskIds(new ArrayList<>());
         project.setImageIds(new ArrayList<>());
         return projectRepository.save(project);
     }
 
     public Optional<Project> getProjectById(@NonNull String id){
-        return projectRepository.findById(id);
+        Optional<Project> project = projectRepository.findById(id);
+        project.ifPresent(SecurityUtils::requireProjectAccess);
+        return project;
     }
 
     public Optional<Project> getProjectByName(@NonNull String name){
-        return projectRepository.findByName(name);
+        Optional<Project> project = projectRepository.findByName(name);
+        project.ifPresent(SecurityUtils::requireProjectAccess);
+        return project;
     }
 
     public List<Project> getProjectsByContractorId(@NonNull String contractorId){
-        return projectRepository.findByContractorId(contractorId);
+        UserPrincipal currentUser = SecurityUtils.requireUser();
+        if (currentUser.isAdmin()) {
+            return projectRepository.findByContractorId(contractorId);
+        }
+        return projectRepository.findByContractorIdAndOwnerId(contractorId, currentUser.getId());
     }
 
     public Optional<Project> getProjectByAddress(@NonNull String address){
-        return projectRepository.findByAddress(address);
+        Optional<Project> project = projectRepository.findByAddress(address);
+        project.ifPresent(SecurityUtils::requireProjectAccess);
+        return project;
     }
 
     public Map<String, Object> getTimeline(@NonNull String id){
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project NOT found"));
+        Project project = requireProjectAccess(id);
 
         Map<String, Object> response = new HashMap<>();
         response.put("ID", project.getId());
@@ -86,14 +103,12 @@ public class ProjectService {
     }
 
     public boolean getFinishedStatus(@NonNull String id) {
-        Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project NOT found"));
+        Project project = requireProjectAccess(id);
         return project.isFinished();
     }
 
     public void deleteProject(@NonNull String id){
-        projectRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        requireProjectAccess(id);
         List<Task> tasks = taskRepository.findByProjectId(id);
         if (!tasks.isEmpty()) {
             taskRepository.deleteAll(tasks);
@@ -109,24 +124,21 @@ public class ProjectService {
     }
 
     public Project addTaskToProject(@NonNull String projectId, Task task) {
-        return projectRepository.findById(projectId).map(project -> {
-            task.setProjectId(projectId);
-            Task savedTask = taskRepository.save(task);
-            List<String> taskIds = project.getTaskIds();
-            if (taskIds == null) {
-                taskIds = new ArrayList<>();
-                project.setTaskIds(taskIds);
-            }
-            taskIds.add(savedTask.getId());
-            return projectRepository.save(project);
-
-        }).orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = requireProjectAccess(projectId);
+        task.setProjectId(projectId);
+        Task savedTask = taskRepository.save(task);
+        List<String> taskIds = project.getTaskIds();
+        if (taskIds == null) {
+            taskIds = new ArrayList<>();
+            project.setTaskIds(taskIds);
+        }
+        taskIds.add(savedTask.getId());
+        return projectRepository.save(project);
     }
 
 
     public void removeTaskFromProject(@NonNull String projectId, @NonNull String taskId){
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project was not found"));
+        Project project = requireProjectAccess(projectId);
 
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task was not found"));
@@ -145,7 +157,7 @@ public class ProjectService {
     }
 
     public Project updateContractor(@NonNull String id, @NonNull String contractorId, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found"));
+        Project project = requireProjectAccess(id);
 
         contractorRepository.findById(contractorId)
                 .orElseThrow(() -> new RuntimeException("Contractor not found"));
@@ -156,7 +168,7 @@ public class ProjectService {
     }
 
     public Project updateAddress(@NonNull String id, @NonNull String address, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
 
         project.setAddress(address);
         applyCoordinates(project, latitude, longitude);
@@ -165,7 +177,7 @@ public class ProjectService {
     }
 
     public Project updateName(@NonNull String id, @NonNull String name, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
 
         project.setName(name);
         applyCoordinates(project, latitude, longitude);
@@ -174,7 +186,7 @@ public class ProjectService {
     }
 
     public Project updateBudget(@NonNull String id, Double budget, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
 
         validateBudget(budget);
         project.setBudget(budget);
@@ -186,7 +198,7 @@ public class ProjectService {
     }
 
     public Project updateWorkers(@NonNull String id, Integer workers, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
         validateWorkers(workers);
         project.setNumber_of_workers(workers);
         applyCoordinates(project, latitude, longitude);
@@ -194,7 +206,7 @@ public class ProjectService {
     }
 
     public Project updateProgress(@NonNull String id, Integer progress, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
         validateProgress(progress);
         project.setProgress(progress);
         applyCoordinates(project, latitude, longitude);
@@ -202,7 +214,7 @@ public class ProjectService {
     }
 
     public Project updateEta(@NonNull String id, Integer eta, Double latitude, Double longitude){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
         validateEta(eta);
         project.setETA(eta);
         applyCoordinates(project, latitude, longitude);
@@ -210,13 +222,13 @@ public class ProjectService {
     }
 
     public Project updateFinishedStatus(@NonNull String id, boolean finished) {
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
         project.setFinished(finished);
         return projectRepository.save(project);
     }
 
     public Project removeContractor(@NonNull String id){
-        Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
+        Project project = requireProjectAccess(id);
         project.setContractor(null);
         return projectRepository.save(project);
     }
@@ -262,6 +274,13 @@ public class ProjectService {
         if (longitude != null) {
             project.setLongitude(longitude);
         }
+    }
+
+    private Project requireProjectAccess(String projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        SecurityUtils.requireProjectAccess(project);
+        return project;
     }
 
 }

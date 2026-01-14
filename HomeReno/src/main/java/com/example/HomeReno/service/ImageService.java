@@ -4,6 +4,8 @@ import com.example.HomeReno.entity.Image;
 import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.repository.ImageRepository;
 import com.example.HomeReno.repository.ProjectRepository;
+import com.example.HomeReno.security.SecurityUtils;
+import com.example.HomeReno.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,22 +29,32 @@ public class ImageService {
     private FileStorageService fileStorageService;
 
     public List<Image> getAllImages() {
-        return imageRepository.findAll();
+        UserPrincipal currentUser = SecurityUtils.requireUser();
+        if (currentUser.isAdmin()) {
+            return imageRepository.findAll();
+        }
+        List<Project> projects = projectRepository.findByOwnerId(currentUser.getId());
+        List<String> projectIds = projects.stream().map(Project::getId).toList();
+        return projectIds.isEmpty() ? List.of() : imageRepository.findByProjectIdIn(projectIds);
     }
 
     public Optional<Image> getImageById(String id) {
-        return imageRepository.findById(id);
+        Optional<Image> image = imageRepository.findById(id);
+        image.ifPresent(existing -> requireProjectAccess(existing.getProjectId()));
+        return image;
     }
 
     public List<Image> getImagesByProjectId(String projectId) {
+        requireProjectAccess(projectId);
         return imageRepository.findByProjectId(projectId);
     }
 
     public Image createImage(Image image) {
         validateImage(image);
-        Project project = projectRepository.findById(image.getProjectId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = requireProjectAccess(image.getProjectId());
         ensureImageCapacity(project, null);
+        UserPrincipal currentUser = SecurityUtils.requireUser();
+        image.setUploadedBy(currentUser.getUsername());
         if (image.getUploadedAt() == null) {
             image.setUploadedAt(LocalDateTime.now());
         }
@@ -51,19 +63,19 @@ public class ImageService {
         return savedImage;
     }
 
-    public Image createImageUpload(String projectId, MultipartFile file, String description, String uploadedBy) {
+    public Image createImageUpload(String projectId, MultipartFile file, String description) {
         if (projectId == null || projectId.isBlank()) {
             throw new IllegalArgumentException("projectId is required");
         }
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = requireProjectAccess(projectId);
         ensureImageCapacity(project, null);
         String url = fileStorageService.storeImage(file);
         Image image = new Image();
         image.setProjectId(projectId);
         image.setUrl(url);
         image.setDescription(description);
-        image.setUploadedBy(uploadedBy);
+        UserPrincipal currentUser = SecurityUtils.requireUser();
+        image.setUploadedBy(currentUser.getUsername());
         image.setUploadedAt(LocalDateTime.now());
         Image savedImage = imageRepository.save(image);
         linkImageToProject(project, savedImage.getId());
@@ -76,8 +88,10 @@ public class ImageService {
                 .map(existing -> {
                     String previousProjectId = existing.getProjectId();
                     String nextProjectId = image.getProjectId();
-                    Project nextProject = projectRepository.findById(nextProjectId)
-                            .orElseThrow(() -> new RuntimeException("Project not found"));
+                    if (previousProjectId != null && !previousProjectId.isBlank()) {
+                        requireProjectAccess(previousProjectId);
+                    }
+                    Project nextProject = requireProjectAccess(nextProjectId);
                     if (previousProjectId == null || !previousProjectId.equals(nextProjectId)) {
                         ensureImageCapacity(nextProject, existing.getId());
                     }
@@ -85,7 +99,6 @@ public class ImageService {
                     existing.setProjectId(nextProjectId);
                     existing.setUrl(image.getUrl());
                     existing.setDescription(image.getDescription());
-                    existing.setUploadedBy(image.getUploadedBy());
                     if (image.getUploadedAt() != null) {
                         existing.setUploadedAt(image.getUploadedAt());
                     }
@@ -114,14 +127,12 @@ public class ImageService {
                 .orElseThrow(() -> new RuntimeException("Image not found"));
         String projectId = image.getProjectId();
         if (projectId != null && !projectId.isBlank()) {
-            projectRepository.findById(projectId)
-                    .ifPresent(project -> {
-                        List<String> imageIds = project.getImageIds();
-                        if (imageIds != null) {
-                            imageIds.removeIf(imageId -> imageId.equals(id));
-                            projectRepository.save(project);
-                        }
-                    });
+            Project project = requireProjectAccess(projectId);
+            List<String> imageIds = project.getImageIds();
+            if (imageIds != null) {
+                imageIds.removeIf(imageId -> imageId.equals(id));
+                projectRepository.save(project);
+            }
         }
         fileStorageService.deleteIfLocal(image.getUrl());
         imageRepository.deleteById(id);
@@ -160,5 +171,12 @@ public class ImageService {
         if (!alreadyLinked && size >= MAX_IMAGES_PER_PROJECT) {
             throw new IllegalArgumentException("project has reached image limit");
         }
+    }
+
+    private Project requireProjectAccess(String projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        SecurityUtils.requireProjectAccess(project);
+        return project;
     }
 }

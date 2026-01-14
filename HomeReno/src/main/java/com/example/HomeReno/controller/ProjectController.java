@@ -7,6 +7,7 @@ import com.example.HomeReno.service.ContractorService;
 import com.example.HomeReno.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,6 +55,8 @@ public class ProjectController {
         try {
             boolean finished = projectService.getFinishedStatus(id);
             return ResponseEntity.ok(Map.of("finished", finished));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -75,6 +78,8 @@ public class ProjectController {
             return response.isEmpty()
                     ? ResponseEntity.noContent().build()
                     : ResponseEntity.ok(response);
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -83,6 +88,8 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> createProject(@RequestBody Project project) {
         try {
             return ResponseEntity.ok(toResponse(projectService.createProject(project)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -94,6 +101,8 @@ public class ProjectController {
         try {
             projectService.deleteProject(id);
             return ResponseEntity.noContent().build();
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -108,6 +117,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateContractor(id, contractorId, latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -124,6 +135,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateAddress(id, address, latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -140,6 +153,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateName(id, name, latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -156,6 +171,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateBudget(id, number.doubleValue(), latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -172,6 +189,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateWorkers(id, workersValue.intValue(), latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -188,6 +207,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateProgress(id, number.intValue(), latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -204,6 +225,8 @@ public class ProjectController {
         Double longitude = getDouble(payload, "longitude");
         try {
             return ResponseEntity.ok(toResponse(projectService.updateEta(id, etaValue.intValue(), latitude, longitude)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -218,6 +241,8 @@ public class ProjectController {
         }
         try {
             return ResponseEntity.ok(toResponse(projectService.updateFinishedStatus(id, finished)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -226,6 +251,8 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> removeProjectContractor(@PathVariable String id) {
         try {
             return ResponseEntity.ok(toResponse(projectService.removeContractor(id)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }
@@ -237,6 +264,8 @@ public class ProjectController {
     ) {
         try {
             return ResponseEntity.ok(toResponse(projectService.addTaskToProject(projectId, task)));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
@@ -246,6 +275,8 @@ public class ProjectController {
         try {
             projectService.removeTaskFromProject(projectId, taskId);
             return ResponseEntity.noContent().build();
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {

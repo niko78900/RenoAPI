@@ -2,10 +2,15 @@ package com.example.HomeReno.controller;
 
 import com.example.HomeReno.service.ContractorService;
 import com.example.HomeReno.service.ProjectService;
+import com.example.HomeReno.security.CustomUserDetailsService;
+import com.example.HomeReno.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ProjectController.class)
+@ImportAutoConfiguration(exclude = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class})
 @Import(ApiKeyFilter.class)
 @TestPropertySource(properties = "api.key=test-key")
 class ProjectControllerTest {
@@ -33,6 +39,12 @@ class ProjectControllerTest {
 
     @MockBean
     private ContractorService contractorService;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void apiKeyMissingReturns401() throws Exception {

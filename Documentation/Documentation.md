@@ -20,10 +20,11 @@ Project Structure
 
 Data Model and Relationships
 Project (collection: projects)
-- Fields: id, name, budget, contractorId, address, latitude, longitude, progress, number_of_workers, finished, taskIds[], imageIds[], ETA.
+- Fields: id, ownerId, name, budget, contractorId, address, latitude, longitude, progress, number_of_workers, finished, taskIds[], imageIds[], ETA.
 - Relationship: projectId links to tasks; contractorId links to contractors.
 - Coordinates are optional and can be set on create or patch.
 - finished is an explicit boolean flag, separate from progress.
+- ownerId is set by the server and is not accepted on requests.
 
 Contractor (collection: contractors)
 - Fields: id, fullName, price, expertise (JUNIOR | APPRENTICE | SENIOR).
@@ -37,6 +38,10 @@ Task (collection: tasks)
 Image (collection: images)
 - Fields: id, projectId, url, description, uploadedAt, uploadedBy.
 - url stores the public path to the file (for local uploads, /uploads/<filename>).
+
+User (collection: users)
+- Fields: id, username, passwordHash (BCrypt), role (USER | ADMIN), enabled, createdAt.
+- enabled=false means the account is pending admin approval.
 
 Source of Truth for Tasks
 - Project.taskIds is the authoritative list of tasks for a project.
@@ -71,6 +76,7 @@ Derived and Automatic Behavior
 - finished is updated only by the dedicated finished endpoint.
 - Latitude/longitude patches are optional; omitted values do not overwrite existing coordinates.
 - Progress is intended to be 0-100.
+- ownerId is set from the authenticated user on project creation.
 
 Validation
 - budget must be >= 0.
@@ -84,6 +90,8 @@ Validation
 - Invalid values return 400.
 
 Error Handling and Status Codes
+- 401: missing or invalid API key or JWT.
+- 403: authenticated but not approved or lacks access to a project.
 - 400: missing or invalid fields on task create/update or project patch endpoints.
 - 400: invalid ranges/coordinates or task does not belong to project on DELETE /api/projects/{projectId}/tasks/{taskId}.
 - 400: invalid contractor payloads (fullName/expertise/price).
@@ -95,9 +103,26 @@ Error Handling and Status Codes
 - 204: no content when a contractor has no projects.
 
 API Endpoints
+Auth API
+- POST /api/auth/register
+  - Body: { "username": "jane", "password": "secret" }
+  - Creates a pending user (enabled=false) that requires admin approval.
+- POST /api/auth/login
+  - Body: { "username": "jane", "password": "secret" }
+  - 200 returns { "token": "...", "tokenType": "Bearer", "username": "jane", "role": "USER" }.
+  - 403 if the account is pending approval.
+
+Admin User API (requires ADMIN)
+- GET /api/admin/users/pending
+  - Returns users waiting for approval.
+- POST /api/admin/users/{id}/approve
+  - Enables the user account.
+
 Project API
+- All project, task, and image operations enforce owner-or-admin access checks.
 - GET /api/projects
   - Returns List<ProjectResponse>.
+  - Regular users see only their own projects; admins see all projects.
 - GET /api/projects/{id}
   - 200 with ProjectResponse, or 404.
 - GET /api/projects/adr/{address}
@@ -224,15 +249,15 @@ Image API
 - POST /api/images
   - Requires projectId and url and links the image to the project.
   - 200 on success, 400 for missing projectId/url, 404 if projectId not found.
+  - uploadedBy is set from the authenticated user.
   - Example body:
     {
       "projectId": "PROJECT_ID_HERE",
       "url": "https://example.com/image.jpg",
-      "description": "Front elevation",
-      "uploadedBy": "jane.builder"
+      "description": "Front elevation"
     }
 - POST /api/images/upload (multipart/form-data)
-  - Fields: projectId (required), file (required), description (optional), uploadedBy (optional).
+  - Fields: projectId (required), file (required), description (optional).
   - 200 on success, 400 for missing projectId/file, invalid image, or limit exceeded, 404 if projectId not found.
 - PUT /api/images/{id}
   - Replaces the image fields and can move the image to a different projectId.
@@ -243,25 +268,32 @@ Image API
 - Max 50 images per project.
 
 Seed Data (Development Only)
-- DataInitializer clears all collections and inserts sample contractors, projects, and tasks.
+- DataInitializer clears projects, tasks, contractors, and users on startup.
 - It runs on application startup and provides consistent data for frontend development.
+- An admin user is created on every startup using seed.admin.username and seed.admin.password.
 
 Configuration
 - HomeReno/src/main/resources/application.properties
   - spring.application.name=HomeReno
   - server.port=8080
   - spring.data.mongodb.uri=mongodb://localhost:27017/HomeReno
+  - security.jwt.secret=...
+  - security.jwt.expiration-minutes=60
+  - seed.admin.username=admin
+  - seed.admin.password=admin123
   - storage.upload-dir=uploads
   - storage.url-prefix=/uploads/
 - Start the server with:
   - mvn spring-boot:run
 
 Security
-- The API requires the X-API-KEY header on requests.
+- Most requests require both X-API-KEY and a JWT (Authorization: Bearer <token>).
+- /api/auth/** requires the API key but does not require a JWT.
+- The API key acts as an application-level access gate alongside user auth to simulate multi-tenant/client access in this demo.
 - Default dev key: dev-local-key.
 - Override via application.properties (api.key=YOUR_KEY) or an environment variable (API_KEY).
 - If api.key is removed or blank, the API returns 500 on requests.
-- Static file serving under /uploads/** is public and does not require an API key.
+- Static file serving under /uploads/** is public.
 
 Testing
 - WebMvc tests cover API key enforcement and image endpoints.

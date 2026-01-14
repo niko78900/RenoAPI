@@ -3,12 +3,17 @@ package com.example.HomeReno.config;
 import com.example.HomeReno.entity.Contractor;
 import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
+import com.example.HomeReno.entity.User;
+import com.example.HomeReno.entity.UserRole;
 import com.example.HomeReno.repository.ContractorRepository;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
+import com.example.HomeReno.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,12 +21,30 @@ import java.util.List;
 @Configuration
 public class DataInitializer {
 
+    @Value("${seed.admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${seed.admin.password:admin123}")
+    private String adminPassword;
+
     @Bean
-    CommandLineRunner initData(ProjectRepository projectRepo, TaskRepository taskRepo, ContractorRepository contractorRepository) {
+    CommandLineRunner initData(ProjectRepository projectRepo,
+                               TaskRepository taskRepo,
+                               ContractorRepository contractorRepository,
+                               UserRepository userRepository,
+                               PasswordEncoder passwordEncoder) {
         return args -> {
             projectRepo.deleteAll();
             taskRepo.deleteAll();
             contractorRepository.deleteAll();
+            userRepository.deleteAll();
+
+            User adminUser = userRepository.save(new User(
+                    adminUsername,
+                    passwordEncoder.encode(adminPassword),
+                    UserRole.ADMIN,
+                    true
+            ));
 
             Contractor c1 = new Contractor("John Markovski", 1200.0, Contractor.Expertise.SENIOR);
             Contractor c2 = new Contractor("Elena Stojanova", 600.0, Contractor.Expertise.JUNIOR);
@@ -32,6 +55,7 @@ public class DataInitializer {
             contractorRepository.saveAll(List.of(c1, c2, c3, c4, c5));
 
             Project project1 = new Project("Home Renovation #1", 50000.0, c1.getId(), "Jurij Gagarin 74A", 3);
+            project1.setOwnerId(adminUser.getId());
             project1.setLatitude(41.9980);
             project1.setLongitude(21.3844);
             seedProject(
@@ -48,6 +72,7 @@ public class DataInitializer {
             );
 
             Project project2 = new Project("Kitchen Overhaul - Park Residence", 32000.0, c2.getId(), "Partizanska 11/3", 2);
+            project2.setOwnerId(adminUser.getId());
             project2.setLatitude(42.0039);
             project2.setLongitude(21.3846);
             seedProject(
@@ -64,6 +89,7 @@ public class DataInitializer {
             );
 
             Project project3 = new Project("Mountain Cabin Extension", 61000.0, c3.getId(), "Matka Canyon Road 5", 4);
+            project3.setOwnerId(adminUser.getId());
             project3.setLatitude(41.9560);
             project3.setLongitude(21.2940);
             seedProject(
@@ -80,6 +106,7 @@ public class DataInitializer {
             );
 
             Project project4 = new Project("Urban Loft Makeover", 45000.0, c4.getId(), "Dimitar Vlahov 27", 3);
+            project4.setOwnerId(adminUser.getId());
             project4.setLatitude(41.9979);
             project4.setLongitude(21.4247);
             seedProject(
@@ -96,6 +123,7 @@ public class DataInitializer {
             );
 
             Project project5 = new Project("Lake House Energy Retrofit", 38000.0, c5.getId(), "Ohrid Lakeshore 88", 2);
+            project5.setOwnerId(adminUser.getId());
             project5.setLatitude(41.1110);
             project5.setLongitude(20.8029);
             seedProject(
@@ -112,6 +140,7 @@ public class DataInitializer {
             );
 
             Project project6 = new Project("Suburban Bathroom Upgrades", 21000.0, c1.getId(), "Blagoja Stefkovski 14", 1);
+            project6.setOwnerId(adminUser.getId());
             project6.setLatitude(42.0035);
             project6.setLongitude(21.4593);
             seedProject(

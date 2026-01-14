@@ -1,12 +1,17 @@
 package com.example.HomeReno.controller;
 
 import com.example.HomeReno.entity.Image;
+import com.example.HomeReno.security.CustomUserDetailsService;
+import com.example.HomeReno.security.JwtService;
 import com.example.HomeReno.service.ImageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -27,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ImageController.class)
+@ImportAutoConfiguration(exclude = {SecurityAutoConfiguration.class, SecurityFilterAutoConfiguration.class})
 @Import(ApiKeyFilter.class)
 @TestPropertySource(properties = "api.key=test-key")
 class ImageControllerTest {
@@ -41,6 +47,12 @@ class ImageControllerTest {
 
     @MockBean
     private ImageService imageService;
+
+    @MockBean
+    private JwtService jwtService;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @Test
     void createImageReturns200() throws Exception {
@@ -77,13 +89,12 @@ class ImageControllerTest {
                 "fake-image".getBytes(StandardCharsets.UTF_8));
 
         when(imageService.createImageUpload(eq("project-id"), any(MultipartFile.class),
-                eq("Front elevation"), eq("tester"))).thenReturn(image);
+                eq("Front elevation"))).thenReturn(image);
 
         mockMvc.perform(multipart("/api/images/upload")
                         .file(file)
                         .param("projectId", "project-id")
                         .param("description", "Front elevation")
-                        .param("uploadedBy", "tester")
                         .header(API_KEY_HEADER, API_KEY))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("image-id"))

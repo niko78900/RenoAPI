@@ -4,6 +4,7 @@ import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,8 @@ public class TaskController {
     public ResponseEntity<Task> createTask(@RequestBody Task task) {
         try {
             return ResponseEntity.ok(taskService.saveTask(task));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -42,6 +45,8 @@ public class TaskController {
     public ResponseEntity<Task> updateTask(@PathVariable String id, @RequestBody Task task) {
         try {
             return ResponseEntity.ok(taskService.updateTask(id, task));
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().build();
         } catch (RuntimeException ex) {
@@ -54,6 +59,8 @@ public class TaskController {
         try {
             taskService.deleteTask(id);
             return ResponseEntity.noContent().build();
+        } catch (AccessDeniedException ex) {
+            return ResponseEntity.status(403).build();
         } catch (RuntimeException ex) {
             return ResponseEntity.notFound().build();
         }

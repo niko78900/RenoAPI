@@ -5,6 +5,8 @@ import com.example.HomeReno.entity.Project;
 import com.example.HomeReno.entity.Task;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
+import com.example.HomeReno.security.SecurityUtils;
+import com.example.HomeReno.security.UserPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,19 +24,26 @@ public class TaskService {
     private ProjectRepository projectRepository;
 
     public List<Task> getAllTasks(){
-        return taskRepository.findAll();
+        UserPrincipal currentUser = SecurityUtils.requireUser();
+        if (currentUser.isAdmin()) {
+            return taskRepository.findAll();
+        }
+        List<Project> projects = projectRepository.findByOwnerId(currentUser.getId());
+        List<String> projectIds = projects.stream().map(Project::getId).toList();
+        return projectIds.isEmpty() ? List.of() : taskRepository.findByProjectIdIn(projectIds);
     }
 
     public Optional<Task> getTaskById(String Id){
-        return taskRepository.findById(Id);
+        Optional<Task> task = taskRepository.findById(Id);
+        task.ifPresent(existing -> requireProjectAccess(existing.getProjectId()));
+        return task;
     }
 
     public Task saveTask(Task task) {
         if (task.getProjectId() == null || task.getProjectId().isBlank()) {
             throw new IllegalArgumentException("projectId is required");
         }
-        Project project = projectRepository.findById(task.getProjectId())
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+        Project project = requireProjectAccess(task.getProjectId());
         Task savedTask = taskRepository.save(task);
         List<String> taskIds = project.getTaskIds();
         if (taskIds == null) {
@@ -56,8 +65,10 @@ public class TaskService {
                 .map(existing -> {
                     String previousProjectId = existing.getProjectId();
                     String nextProjectId = task.getProjectId();
-                    Project nextProject = projectRepository.findById(nextProjectId)
-                            .orElseThrow(() -> new RuntimeException("Project not found"));
+                    if (previousProjectId != null && !previousProjectId.isBlank()) {
+                        requireProjectAccess(previousProjectId);
+                    }
+                    Project nextProject = requireProjectAccess(nextProjectId);
 
                     existing.setName(task.getName());
                     existing.setStatus(task.getStatus());
@@ -95,19 +106,25 @@ public class TaskService {
                 .orElseThrow(() -> new RuntimeException("Task not found"));
         String projectId = task.getProjectId();
         if (projectId != null && !projectId.isBlank()) {
-            projectRepository.findById(projectId)
-                    .ifPresent(project -> {
-                        List<String> taskIds = project.getTaskIds();
-                        if (taskIds != null) {
-                            taskIds.removeIf(taskId -> taskId.equals(id));
-                            projectRepository.save(project);
-                        }
-                    });
+            Project project = requireProjectAccess(projectId);
+            List<String> taskIds = project.getTaskIds();
+            if (taskIds != null) {
+                taskIds.removeIf(taskId -> taskId.equals(id));
+                projectRepository.save(project);
+            }
         }
         taskRepository.deleteById(id);
     }
     
     public List<Task> getTasksByProjectId(String projectId) {
-    return taskRepository.findByProjectId(projectId);
+        requireProjectAccess(projectId);
+        return taskRepository.findByProjectId(projectId);
+    }
+
+    private Project requireProjectAccess(String projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new RuntimeException("Project not found"));
+        SecurityUtils.requireProjectAccess(project);
+        return project;
     }
 }

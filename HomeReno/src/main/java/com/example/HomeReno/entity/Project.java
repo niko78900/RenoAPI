@@ -1,6 +1,7 @@
 package com.example.HomeReno.entity;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,6 +14,9 @@ public class Project {
 
     @Id
     private String id;
+
+    @JsonIgnore
+    private String ownerId;
     
     private String name;
     private Double budget;
@@ -83,6 +87,14 @@ public class Project {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(String ownerId) {
+        this.ownerId = ownerId;
     }
 
     public void setTaskIds(List<String> taskIds) {
