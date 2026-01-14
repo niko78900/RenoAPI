@@ -9,6 +9,7 @@ import com.example.HomeReno.repository.ImageRepository;
 import com.example.HomeReno.repository.ProjectRepository;
 import com.example.HomeReno.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,23 +55,23 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Optional<Project> getProjectById(String id){
+    public Optional<Project> getProjectById(@NonNull String id){
         return projectRepository.findById(id);
     }
 
-    public Optional<Project> getProjectByName(String name){
+    public Optional<Project> getProjectByName(@NonNull String name){
         return projectRepository.findByName(name);
     }
 
-    public List<Project> getProjectsByContractorId(String contractorId){
+    public List<Project> getProjectsByContractorId(@NonNull String contractorId){
         return projectRepository.findByContractorId(contractorId);
     }
 
-    public Optional<Project> getProjectByAddress(String address){
+    public Optional<Project> getProjectByAddress(@NonNull String address){
         return projectRepository.findByAddress(address);
     }
 
-    public Map<String, Object> getTimeline(String id){
+    public Map<String, Object> getTimeline(@NonNull String id){
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project NOT found"));
 
@@ -84,13 +85,13 @@ public class ProjectService {
         return response;
     }
 
-    public boolean getFinishedStatus(String id) {
+    public boolean getFinishedStatus(@NonNull String id) {
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project NOT found"));
         return project.isFinished();
     }
 
-    public void deleteProject(String id){
+    public void deleteProject(@NonNull String id){
         projectRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
         List<Task> tasks = taskRepository.findByProjectId(id);
@@ -107,7 +108,7 @@ public class ProjectService {
         projectRepository.deleteById(id);
     }
 
-    public Project addTaskToProject(String projectId, Task task) {
+    public Project addTaskToProject(@NonNull String projectId, Task task) {
         return projectRepository.findById(projectId).map(project -> {
             task.setProjectId(projectId);
             Task savedTask = taskRepository.save(task);
@@ -123,7 +124,7 @@ public class ProjectService {
     }
 
 
-    public void removeTaskFromProject(String projectId, String taskId){
+    public void removeTaskFromProject(@NonNull String projectId, @NonNull String taskId){
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project was not found"));
 
@@ -143,7 +144,7 @@ public class ProjectService {
         taskRepository.deleteById(taskId);
     }
 
-    public Project updateContractor(String id, String contractorId, Double latitude, Double longitude){
+    public Project updateContractor(@NonNull String id, @NonNull String contractorId, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found"));
 
         contractorRepository.findById(contractorId)
@@ -154,7 +155,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateAddress(String id, String address, Double latitude, Double longitude){
+    public Project updateAddress(@NonNull String id, @NonNull String address, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
         project.setAddress(address);
@@ -163,7 +164,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateName(String id, String name, Double latitude, Double longitude){
+    public Project updateName(@NonNull String id, @NonNull String name, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
         project.setName(name);
@@ -172,7 +173,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateBudget(String id, Double budget, Double latitude, Double longitude){
+    public Project updateBudget(@NonNull String id, Double budget, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
 
         validateBudget(budget);
@@ -184,7 +185,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateWorkers(String id, Integer workers, Double latitude, Double longitude){
+    public Project updateWorkers(@NonNull String id, Integer workers, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         validateWorkers(workers);
         project.setNumber_of_workers(workers);
@@ -192,7 +193,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateProgress(String id, Integer progress, Double latitude, Double longitude){
+    public Project updateProgress(@NonNull String id, Integer progress, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         validateProgress(progress);
         project.setProgress(progress);
@@ -200,7 +201,7 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateEta(String id, Integer eta, Double latitude, Double longitude){
+    public Project updateEta(@NonNull String id, Integer eta, Double latitude, Double longitude){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         validateEta(eta);
         project.setETA(eta);
@@ -208,13 +209,13 @@ public class ProjectService {
         return projectRepository.save(project);
     }
 
-    public Project updateFinishedStatus(String id, boolean finished) {
+    public Project updateFinishedStatus(@NonNull String id, boolean finished) {
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setFinished(finished);
         return projectRepository.save(project);
     }
 
-    public Project removeContractor(String id){
+    public Project removeContractor(@NonNull String id){
         Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project was not found!"));
         project.setContractor(null);
         return projectRepository.save(project);
